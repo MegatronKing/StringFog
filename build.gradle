@@ -3,9 +3,6 @@
 buildscript {
     repositories {
         jcenter()
-        maven {
-            url uri("./maven")
-        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.2.0'
