@@ -1,0 +1,17 @@
+apply plugin: 'java'
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+}
+
+targetCompatibility = '1.7'
+sourceCompatibility = '1.7'
+
+group=GROUP
+archivesBaseName=ARTIFACTID
+version=VERSION
+
+[compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
+
+apply from: '../bintray_java.gradle'
+//apply from: '../nexus_java.gradle'

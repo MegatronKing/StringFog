@@ -1,0 +1,105 @@
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
+
+group = GROUP
+version = VERSION
+project.archivesBaseName = ARTIFACTID
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from 'build/docs/javadoc'
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+javadoc {
+    options{
+        encoding "UTF-8"
+        charSet 'UTF-8'
+        author true
+        version true
+        links "http://docs.oracle.com/javase/7/docs/api"
+        title "$ARTIFACTID $VERSION"
+    }
+}
+
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            name project.name
+            description POM_DESCRIPTION
+            url POM_URL
+
+            packaging POM_PACKAGING
+            groupId GROUP
+            artifactId ARTIFACTID
+            version VERSION
+
+            licenses {
+                license {
+                    name POM_LICENCE_NAME
+                    url POM_LICENCE_URL
+                    distribution POM_LICENCE_DIST
+                }
+            }
+            scm {
+                connection POM_SCM_CONNECTION
+                url POM_URL
+
+            }
+            developers {
+                developer {
+                    id POM_DEVELOPER_ID
+                    name POM_DEVELOPER_NAME
+                    email POM_DEVELOPER_EMAIL
+                }
+            }
+        }
+    }
+}
+
+bintray {
+
+    def pFile = file("${rootDir}//local.properties")
+
+    Properties p = new Properties()
+
+    pFile.withInputStream { stream->
+        p.load(stream)
+    }
+
+    user = p.getProperty('BINTRAY_USER')
+    key = p.getProperty('BINTRAY_KEY')
+
+    configurations = ['archives']
+
+    dryRun = false
+    publish = true
+
+    pkg {
+        repo = 'maven'
+        name = project.name
+        licenses = ['Apache-2.0']
+        vcsUrl = POM_URL
+        websiteUrl = POM_URL
+        issueTrackerUrl = POM_URL
+        publicDownloadNumbers = true
+        version {
+            name = VERSION
+            desc = POM_DESCRIPTION
+            vcsTag = VERSION
+
+            gpg {
+                sign = true
+            }
+        }
+    }
+}

@@ -1,0 +1,30 @@
+apply plugin: 'groovy'
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+    compile 'com.android.tools.build:gradle:2.2.0'
+    compile 'org.ow2.asm:asm-all:5.0.4'
+    compile project(':stringfog-lib')
+}
+
+sourceSets {
+    main {
+        groovy {
+            srcDir 'src/main/groovy'
+        }
+
+        resources {
+            srcDir 'src/main/resources'
+        }
+    }
+}
+
+group=GROUP
+archivesBaseName=ARTIFACTID
+version=VERSION
+
+[compileJava, compileGroovy, javadoc]*.options*.encoding = 'UTF-8'
+
+apply from: '../bintray_java.gradle'
+//apply from: '../nexus_java.gradle'

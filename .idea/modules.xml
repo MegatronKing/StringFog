@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/StringFog.iml" filepath="$PROJECT_DIR$/StringFog.iml" />
+      <module fileurl="file://$PROJECT_DIR$/stringfog-gradle-plugin/stringfog-gradle-plugin.iml" filepath="$PROJECT_DIR$/stringfog-gradle-plugin/stringfog-gradle-plugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/stringfog-lib/stringfog-lib.iml" filepath="$PROJECT_DIR$/stringfog-lib/stringfog-lib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/stringfog-sample/stringfog-sample.iml" filepath="$PROJECT_DIR$/stringfog-sample/stringfog-sample.iml" />
+    </modules>
+  </component>
+</project>
