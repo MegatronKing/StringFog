@@ -15,9 +15,9 @@ String a = Decoder.decode("ABCDEFGHIJKLMN");
 将dex中的字符串进行加密，可以提高反编译的难度，对于类似appId、appKey等敏感字符串，进行自动加密后，逆向应用时在使用jadx这一类反编译工具定位查找这些字符串的难度将加大，比如微信的appId前缀是"wx"，不加密基本上直接就可以搜索定位出来。当然，这里需要声明一点，没有绝对的安全，由于解密Key和算法是同样写在dex里面的，逆向时处理一下是可以还原出字符串内容的。另外，在运行时解密字符串会相应地降低性能，不过由于算法简单，影响不大。
 
 ### 演示
-加密前：<br>
+#####加密前：
 ![](https://github.com/MegatronKing/StringFog/blob/master/assets/before.png)
-加密后：<br>
+#####加密后：
 ![](https://github.com/MegatronKing/StringFog/blob/master/assets/after.png)
 
 ### 使用
