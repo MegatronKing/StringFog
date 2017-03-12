@@ -5,7 +5,7 @@
 在java文件编译成class字节码后，class字节码压缩成dex文件前，利用ASM库对class字节码中的字符串进行加密，同时将解密调用自动写进class字节码中，做到在运行时还原字符串内容，举个栗子：
 - 原文：
 ```
-String a = "This is s string!";
+String a = "This is a string!";
 ```
 - 加密：
 ```
