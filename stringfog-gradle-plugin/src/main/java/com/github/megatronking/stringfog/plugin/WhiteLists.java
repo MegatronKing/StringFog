@@ -30,8 +30,10 @@ public final class WhiteLists {
         addWhiteList("com.alipay", FLAG_PACKAGE);
         addWhiteList("com.alibaba", FLAG_PACKAGE);
         addWhiteList("com.tencent", FLAG_PACKAGE);
-        addWhiteList("de.greenrobot", FLAG_PACKAGE);
         addWhiteList("com.qq", FLAG_PACKAGE);
+        addWhiteList("de.greenrobot", FLAG_PACKAGE);
+        addWhiteList("rx", FLAG_PACKAGE);
+        addWhiteList("com.squareup", FLAG_PACKAGE);
 
         // default classes short name in white list.
         addWhiteList("BuildConfig", FLAG_CLASS);

@@ -1,4 +1,5 @@
 apply plugin: 'groovy'
+//apply plugin: 'maven'
 
 dependencies {
     compile gradleApi()
@@ -26,5 +27,13 @@ version=VERSION
 
 [compileJava, compileGroovy, javadoc]*.options*.encoding = 'UTF-8'
 
-apply from: '../bintray_java.gradle'
+//uploadArchives {
+//    repositories {
+//        mavenDeployer {
+//            repository(url: uri('../maven'))
+//        }
+//    }
+//}
+
+//apply from: '../bintray_java.gradle'
 //apply from: '../nexus_java.gradle'

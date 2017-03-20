@@ -6,6 +6,7 @@ import com.android.build.api.transform.Status
 import com.android.build.api.transform.Transform
 import com.android.build.api.transform.TransformException
 import com.android.build.api.transform.TransformInvocation
+import com.android.utils.FileUtils
 import com.google.common.collect.ImmutableSet
 import com.google.common.io.Files
 import groovy.io.FileType
@@ -70,10 +71,7 @@ class StringFogTransform extends Transform {
         if (!dirInputs.isEmpty() || !jarInputs.isEmpty()) {
             File dirOutput = transformInvocation.outputProvider.getContentLocation(
                     "classes", getOutputTypes(), getScopes(), Format.DIRECTORY)
-            if (!dirOutput.exists()) {
-                dirOutput.mkdirs()
-            }
-
+            FileUtils.mkdirs(dirOutput)
             if (!dirInputs.isEmpty()) {
                 dirInputs.each { dirInput ->
                     if (transformInvocation.incremental) {
@@ -81,9 +79,7 @@ class StringFogTransform extends Transform {
                             File fileInput = entry.getKey()
                             File fileOutput = new File(fileInput.getAbsolutePath().replace(
                                     dirInput.file.getAbsolutePath(), dirOutput.getAbsolutePath()))
-                            if (!fileOutput.exists()) {
-                                fileOutput.getParentFile().mkdirs()
-                            }
+                            FileUtils.mkdirs(fileOutput.parentFile)
                             Status fileStatus = entry.getValue()
                             switch(fileStatus) {
                                 case Status.ADDED:
@@ -115,9 +111,7 @@ class StringFogTransform extends Transform {
 
                         dirInput.file.traverse(type: FileType.FILES) { fileInput ->
                             File fileOutput = new File(fileInput.getAbsolutePath().replace(dirInput.file.getAbsolutePath(), dirOutput.getAbsolutePath()))
-                            if (!fileOutput.exists()) {
-                                fileOutput.getParentFile().mkdirs()
-                            }
+                            FileUtils.mkdirs(fileOutput.parentFile)
                             if (!fileInput.getName().endsWith('.class') || !mEnable) {
                                 Files.copy(fileInput, fileOutput)
                             } else {
@@ -134,9 +128,8 @@ class StringFogTransform extends Transform {
                     File jarOutputFile = transformInvocation.outputProvider.getContentLocation(
                             getUniqueHashName(jarInputFile), getOutputTypes(), getScopes(), Format.JAR
                     )
-                    if (!jarOutputFile.exists()) {
-                        jarOutputFile.getParentFile().mkdirs()
-                    }
+
+                    FileUtils.mkdirs(jarOutputFile.parentFile)
 
                     switch (jarInput.status) {
                         case Status.NOTCHANGED:

@@ -4,7 +4,7 @@ import java.io.UnsupportedEncodingException;
 
 public final class Base64Fog {
 
-    public static final String DEFAULT_KEY = "Megatron";
+    public static final String DEFAULT_KEY = "StringFog";
 
     public static String decode(String data) {
         return decode(data, DEFAULT_KEY);
@@ -15,9 +15,6 @@ public final class Base64Fog {
     }
 
     public static String encode(String data, String key) {
-        if (key == null || key.length() == 0) {
-            key = DEFAULT_KEY;
-        }
         String newData;
         try {
             newData = new String(Base64.encode(xor(data.getBytes("UTF-8"), key), Base64.NO_WRAP));
@@ -28,9 +25,6 @@ public final class Base64Fog {
     }
 
     public static String decode(String data, String key) {
-        if (key == null || key.length() == 0) {
-            key = DEFAULT_KEY;
-        }
         String newData;
         try {
             newData = new String(xor(Base64.decode(data, Base64.NO_WRAP), key), "UTF-8");

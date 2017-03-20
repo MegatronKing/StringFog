@@ -82,8 +82,8 @@ public final class StringFogClassInjector {
     private static void processClass(InputStream classIn, OutputStream classOut, String key) throws IOException {
         ClassReader cr = new ClassReader(classIn);
         ClassWriter cw = new ClassWriter(0);
-        ClassVisitor aia = ClassVisitorFactory.create(cr.getClassName(), key, cw);
-        cr.accept(aia, 0);
+        ClassVisitor cv = ClassVisitorFactory.create(cr.getClassName(), key, cw);
+        cr.accept(cv, 0);
         classOut.write(cw.toByteArray());
         classOut.flush();
     }
