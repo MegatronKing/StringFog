@@ -6,6 +6,8 @@
       <module fileurl="file://$PROJECT_DIR$/stringfog-gradle-plugin/stringfog-gradle-plugin.iml" filepath="$PROJECT_DIR$/stringfog-gradle-plugin/stringfog-gradle-plugin.iml" />
       <module fileurl="file://$PROJECT_DIR$/stringfog-lib/stringfog-lib.iml" filepath="$PROJECT_DIR$/stringfog-lib/stringfog-lib.iml" />
       <module fileurl="file://$PROJECT_DIR$/stringfog-sample/stringfog-sample.iml" filepath="$PROJECT_DIR$/stringfog-sample/stringfog-sample.iml" />
+      <module fileurl="file://$PROJECT_DIR$/stringfog-sample-app/stringfog-sample-app.iml" filepath="$PROJECT_DIR$/stringfog-sample-app/stringfog-sample-app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/stringfog-sample-library/stringfog-sample-library.iml" filepath="$PROJECT_DIR$/stringfog-sample-library/stringfog-sample-library.iml" />
     </modules>
   </component>
 </project>

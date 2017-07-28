@@ -6,6 +6,7 @@ dependencies {
     compile localGroovy()
     compile 'com.android.tools.build:gradle:2.2.0'
     compile 'org.ow2.asm:asm-all:5.0.4'
+    compile 'com.squareup:javapoet:1.9.0'
     compile project(':stringfog-lib')
 }
 

@@ -31,7 +31,7 @@ buildscript {
     }
     dependencies {
         ...
-        classpath 'com.github.megatronking.stringfog:gradle-plugin:1.0.1'
+        classpath 'com.github.megatronking.stringfog:gradle-plugin:1.2.0'
     }
 }
 ```
@@ -48,7 +48,7 @@ stringfog {
 ```
 dependencies {
       ...
-      compile 'com.github.megatronking.stringfog:lib:1.0.1'
+      compile 'com.github.megatronking.stringfog:lib:1.2.0'
 }
 ```
 
@@ -65,6 +65,8 @@ addWhiteList("com.alibaba", FLAG_PACKAGE);
 addWhiteList("com.tencent", FLAG_PACKAGE);
 addWhiteList("de.greenrobot", FLAG_PACKAGE);
 addWhiteList("com.qq", FLAG_PACKAGE);
+addWhiteList("rx", FLAG_PACKAGE);
+addWhiteList("com.squareup", FLAG_PACKAGE);
 
 // default short class names in white list.
 addWhiteList("BuildConfig", FLAG_CLASS);
@@ -77,6 +79,13 @@ public class Test {
     ...
 }
 ```
+
+# 更新日志
+
+## v1.2.0
+- 支持在library中使用，每个library可以使用不同key
+- 支持exclude指定包名不进行加密
+- 修复一些已知bug
 
 
 --------

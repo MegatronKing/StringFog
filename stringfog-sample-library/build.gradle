@@ -1,0 +1,43 @@
+apply plugin: 'com.android.library'
+apply plugin: 'stringfog'
+
+// 此Library使用了Fog，那么Application中需要手动exclude此库
+// 每个Library可以定义不同的加密key
+stringfog {
+
+    key 'Hello Library'
+    enable true
+    debug false
+
+}
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion "26.0.0"
+
+    defaultConfig {
+        minSdkVersion 15
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:26.+'
+    compile 'com.github.megatronking.stringfog:lib:1.2.0'
+    testCompile 'junit:junit:4.12'
+}

@@ -35,12 +35,20 @@ import java.util.zip.ZipOutputStream;
 
 public final class StringFogClassInjector {
 
-    public static void doFog2Class(File classIn, File classOut, String key) throws IOException {
+    public String[] mExcludePackages;
+    public String mFogClassName;
+
+    public StringFogClassInjector(String[] excludePackages, String fogClassName) {
+        this.mExcludePackages = excludePackages;
+        this.mFogClassName = fogClassName;
+    }
+
+    public void doFog2Class(File fileIn, File fileOut, String key) throws IOException {
         InputStream is = null;
         OutputStream os = null;
         try {
-            is = new BufferedInputStream(new FileInputStream(classIn));
-            os = new BufferedOutputStream(new FileOutputStream(classOut));
+            is = new BufferedInputStream(new FileInputStream(fileIn));
+            os = new BufferedOutputStream(new FileOutputStream(fileOut));
             processClass(is, os, key);
         } finally {
             closeQuietly(os);
@@ -48,7 +56,7 @@ public final class StringFogClassInjector {
         }
     }
 
-    public static void doFog2Jar(File jarIn, File jarOut, String key) throws IOException {
+    public void doFog2Jar(File jarIn, File jarOut, String key) throws IOException {
         try {
             processJar(jarIn, jarOut, key, Charset.forName("UTF-8"), Charset.forName("UTF-8"));
         } catch (IllegalArgumentException e) {
@@ -61,7 +69,7 @@ public final class StringFogClassInjector {
     }
 
     @SuppressWarnings("NewApi")
-    private static void processJar(File jarIn, File jarOut, String key, Charset charsetIn, Charset charsetOut) throws IOException {
+    private void processJar(File jarIn, File jarOut, String key, Charset charsetIn, Charset charsetOut) throws IOException {
         ZipInputStream zis = null;
         ZipOutputStream zos = null;
         try {
@@ -92,17 +100,17 @@ public final class StringFogClassInjector {
         }
     }
 
-    private static void processClass(InputStream classIn, OutputStream classOut, String key) throws IOException {
+    private void processClass(InputStream classIn, OutputStream classOut, String key) throws IOException {
         ClassReader cr = new ClassReader(classIn);
         ClassWriter cw = new ClassWriter(0);
-        ClassVisitor cv = ClassVisitorFactory.create(cr.getClassName(), key, cw);
+        ClassVisitor cv = ClassVisitorFactory.create(mExcludePackages, mFogClassName, cr.getClassName(), key, cw);
         cr.accept(cv, 0);
         classOut.write(cw.toByteArray());
         classOut.flush();
     }
 
 
-    private static void closeQuietly(Closeable target) {
+    private void closeQuietly(Closeable target) {
         if (target != null) {
             try {
                 target.close();
@@ -112,7 +120,7 @@ public final class StringFogClassInjector {
         }
     }
 
-    private static int copy(InputStream in, OutputStream out) throws IOException {
+    private int copy(InputStream in, OutputStream out) throws IOException {
         int total = 0;
         byte[] buffer = new byte[8192];
         int c;
@@ -122,4 +130,5 @@ public final class StringFogClassInjector {
         }
         return total;
     }
+
 }

@@ -14,11 +14,13 @@
 package com.github.megatronking.stringfog.plugin;
 
 
-import com.github.megatronking.stringfog.lib.Base64Fog;
+import com.github.megatronking.stringfog.plugin.utils.TextUtils;
 
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
+
+import java.io.File;
 
 /**
  * A factory creates {@link ClassVisitor}.
@@ -32,19 +34,30 @@ public final class ClassVisitorFactory {
     private ClassVisitorFactory() {
     }
 
-    public static ClassVisitor create(String className, String key, ClassWriter cw) {
-        if (Base64Fog.class.getName().replace('.', '/').equals(className)) {
-            return new Base64FogClassVisitor(key, cw);
-        }
-        if (WhiteLists.inWhiteList(className, WhiteLists.FLAG_PACKAGE) || WhiteLists.inWhiteList(className, WhiteLists.FLAG_CLASS)) {
+    public static ClassVisitor create(String[] excludePackages, String fogClassName, String className, String key, ClassWriter cw) {
+        if (WhiteLists.inWhiteList(className, WhiteLists.FLAG_PACKAGE)
+                || WhiteLists.inWhiteList(className, WhiteLists.FLAG_CLASS) || isInExcludePackages(excludePackages, className)) {
+            System.out.println("StringFog Ignore: " + className);
             return createEmpty(cw);
         }
-        return new StringFogClassVisitor(key, cw);
+        return new StringFogClassVisitor(fogClassName, key, cw);
     }
 
     public static ClassVisitor createEmpty(ClassWriter cw) {
         return new ClassVisitor(Opcodes.ASM5, cw) {
         };
+    }
+
+    private static boolean isInExcludePackages(String[] excludePackages, String className) {
+        if (excludePackages == null || excludePackages.length == 0 || TextUtils.isEmpty(className)) {
+            return false;
+        }
+        for (String excludePackage : excludePackages) {
+            if (className.replace(File.separatorChar, '.').startsWith(excludePackage + ".")) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

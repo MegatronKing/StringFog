@@ -24,6 +24,7 @@ import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +38,7 @@ import java.util.List;
 public class StringFogClassVisitor extends ClassVisitor {
 
     private static final String IGNORE_ANNOTATION = "Lcom/github/megatronking/stringfog/lib/annotation/StringFogIgnore;";
-    private static final String BASE64_FOG_CLASS_NAME = Base64Fog.class.getName().replace('.', '/');
+    private String mFogClassName;
 
     private boolean isClInitExists;
 
@@ -51,9 +52,10 @@ public class StringFogClassVisitor extends ClassVisitor {
 
     private boolean mIgnoreClass;
 
-    public StringFogClassVisitor(String key, ClassWriter cw) {
+    public StringFogClassVisitor(String fogClassName, String key, ClassWriter cw) {
         super(Opcodes.ASM5, cw);
         this.mKey = key;
+        this.mFogClassName = fogClassName.replace('.', File.separatorChar);
     }
 
     @Override
@@ -118,7 +120,7 @@ public class StringFogClassVisitor extends ClassVisitor {
                                 continue;
                             }
                             super.visitLdcInsn(Base64Fog.encode(field.value, mKey));
-                            super.visitMethodInsn(Opcodes.INVOKESTATIC, BASE64_FOG_CLASS_NAME, "decode", "(Ljava/lang/String;)Ljava/lang/String;", false);
+                            super.visitMethodInsn(Opcodes.INVOKESTATIC, mFogClassName, "decode", "(Ljava/lang/String;)Ljava/lang/String;", false);
                             super.visitFieldInsn(Opcodes.PUTSTATIC, mClassName, field.name, ClassStringField.STRING_DESC);
                         }
                     }
@@ -129,7 +131,7 @@ public class StringFogClassVisitor extends ClassVisitor {
                         if (cst != null && cst instanceof String && !TextUtils.isEmptyAfterTrim((String) cst)) {
                             lastStashCst = (String) cst;
                             super.visitLdcInsn(Base64Fog.encode(lastStashCst, mKey));
-                            super.visitMethodInsn(Opcodes.INVOKESTATIC, BASE64_FOG_CLASS_NAME, "decode", "(Ljava/lang/String;)Ljava/lang/String;", false);
+                            super.visitMethodInsn(Opcodes.INVOKESTATIC, mFogClassName, "decode", "(Ljava/lang/String;)Ljava/lang/String;", false);
                         } else {
                             lastStashCst = null;
                             super.visitLdcInsn(cst);
@@ -168,7 +170,7 @@ public class StringFogClassVisitor extends ClassVisitor {
                         // We don't care about whether the field is final or normal
                         if (cst != null && cst instanceof String && !TextUtils.isEmptyAfterTrim((String) cst)) {
                             super.visitLdcInsn(Base64Fog.encode((String) cst, mKey));
-                            super.visitMethodInsn(Opcodes.INVOKESTATIC, BASE64_FOG_CLASS_NAME, "decode", "(Ljava/lang/String;)Ljava/lang/String;", false);
+                            super.visitMethodInsn(Opcodes.INVOKESTATIC, mFogClassName, "decode", "(Ljava/lang/String;)Ljava/lang/String;", false);
                         } else {
                             super.visitLdcInsn(cst);
                         }
@@ -198,7 +200,7 @@ public class StringFogClassVisitor extends ClassVisitor {
                             }
                             // local variables
                             super.visitLdcInsn(Base64Fog.encode((String) cst, mKey));
-                            super.visitMethodInsn(Opcodes.INVOKESTATIC, BASE64_FOG_CLASS_NAME, "decode", "(Ljava/lang/String;)Ljava/lang/String;", false);
+                            super.visitMethodInsn(Opcodes.INVOKESTATIC, mFogClassName, "decode", "(Ljava/lang/String;)Ljava/lang/String;", false);
                             return;
                         }
                         super.visitLdcInsn(cst);
@@ -221,7 +223,7 @@ public class StringFogClassVisitor extends ClassVisitor {
                     continue; // It could not be happened
                 }
                 mv.visitLdcInsn(Base64Fog.encode(field.value, mKey));
-                mv.visitMethodInsn(Opcodes.INVOKESTATIC, BASE64_FOG_CLASS_NAME, "decode", "(Ljava/lang/String;)Ljava/lang/String;", false);
+                mv.visitMethodInsn(Opcodes.INVOKESTATIC, mFogClassName, "decode", "(Ljava/lang/String;)Ljava/lang/String;", false);
                 mv.visitFieldInsn(Opcodes.PUTSTATIC, mClassName, field.name, ClassStringField.STRING_DESC);
             }
             mv.visitInsn(Opcodes.RETURN);

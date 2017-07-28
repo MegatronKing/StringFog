@@ -14,52 +14,70 @@
 
 package com.github.megatronking.stringfog.plugin
 
-import com.android.build.api.transform.Format
-import com.android.build.api.transform.QualifiedContent
-import com.android.build.api.transform.Status
-import com.android.build.api.transform.Transform
-import com.android.build.api.transform.TransformException
-import com.android.build.api.transform.TransformInvocation
+import com.android.build.api.transform.*
+import com.android.build.gradle.api.BaseVariant
 import com.android.utils.FileUtils
+import com.github.megatronking.stringfog.plugin.utils.MD5
 import com.google.common.collect.ImmutableSet
 import com.google.common.io.Files
 import groovy.io.FileType
+import org.gradle.api.DomainObjectSet
 import org.gradle.api.Project
-import com.github.megatronking.stringfog.plugin.utils.MD5
 
-class StringFogTransform extends Transform {
+public abstract class StringFogTransform extends Transform {
 
     private static final String TRANSFORM_NAME = 'stringFog'
 
-    private String mKey;
-    private boolean mEnable;
+    protected String mKey;
+    protected boolean mEnable;
 
-    StringFogTransform(Project project) {
+    protected StringFogClassInjector mInjector;
+
+    public StringFogTransform(Project project, DomainObjectSet<BaseVariant> variants) {
         project.afterEvaluate {
-            this.mKey = project.stringfog.key
-            this.mEnable = project.stringfog.enable
+            mKey = project.stringfog.key
+            if (mKey == null || mKey.length() == 0) {
+                throw new IllegalArgumentException("Key of stringfog can not be empty!");
+            }
+            mEnable = project.stringfog.enable
+            if (mEnable) {
+                createFogClass(variants)
+                createInjector(project.stringfog.exclude, variants)
+            }
+        }
+    }
+
+    public void createFogClass(DomainObjectSet<BaseVariant> variants) {
+        variants.all { variant ->
+            variant.outputs.forEach { output ->
+                def processResources = output.processResources
+                processResources.doLast {
+                    def stringfogDir = variant.applicationId.replace((char)'.', (char)File.separatorChar)
+                    def stringfogFile = new File(processResources.sourceOutputDir, stringfogDir + File.separator + "StringFog.java")
+                    StringFogClassBuilder.buildStringFogClass(stringfogFile, processResources.sourceOutputDir,
+                            variant.applicationId, "StringFog", mKey)
+                }
+            }
+        }
+    }
+
+    public void createInjector(String[] excludePackages, DomainObjectSet<BaseVariant> variants) {
+        variants.all { variant ->
+            if (mInjector == null) {
+                mInjector = new StringFogClassInjector(excludePackages, variant.applicationId + ".StringFog")
+            }
+            return true
         }
     }
 
     @Override
-    String getName() {
+    public String getName() {
         return TRANSFORM_NAME
     }
 
     @Override
-    Set<QualifiedContent.ContentType> getInputTypes() {
+    public Set<QualifiedContent.ContentType> getInputTypes() {
         return ImmutableSet.of(QualifiedContent.DefaultContentType.CLASSES)
-    }
-
-    @Override
-    Set<QualifiedContent.Scope> getScopes() {
-        return ImmutableSet.of(
-                QualifiedContent.Scope.PROJECT,
-                QualifiedContent.Scope.SUB_PROJECTS,
-                QualifiedContent.Scope.PROJECT_LOCAL_DEPS,
-                QualifiedContent.Scope.SUB_PROJECTS_LOCAL_DEPS,
-                QualifiedContent.Scope.EXTERNAL_LIBRARIES
-        )
     }
 
     @Override
@@ -68,7 +86,7 @@ class StringFogTransform extends Transform {
     }
 
     @Override
-    void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
+    public void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
         def dirInputs = new HashSet<>()
         def jarInputs = new HashSet<>()
 
@@ -101,10 +119,10 @@ class StringFogTransform extends Transform {
                                     if (fileInput.isDirectory()) {
                                         return // continue.
                                     }
-                                    if (!fileInput.getName().endsWith('.class')|| !mEnable) {
+                                    if (!fileInput.getName().endsWith('.class') || !mEnable || mInjector == null) {
                                         Files.copy(fileInput, fileOutput)
                                     } else {
-                                        StringFogClassInjector.doFog2Class(fileInput, fileOutput, mKey)
+                                        mInjector.doFog2Class(fileInput, fileOutput, mKey)
                                     }
                                     break
                                 case Status.REMOVED:
@@ -126,10 +144,10 @@ class StringFogTransform extends Transform {
                         dirInput.file.traverse(type: FileType.FILES) { fileInput ->
                             File fileOutput = new File(fileInput.getAbsolutePath().replace(dirInput.file.getAbsolutePath(), dirOutput.getAbsolutePath()))
                             FileUtils.mkdirs(fileOutput.parentFile)
-                            if (!fileInput.getName().endsWith('.class') || !mEnable) {
+                            if (!fileInput.getName().endsWith('.class') || !mEnable || mInjector == null) {
                                 Files.copy(fileInput, fileOutput)
                             } else {
-                                StringFogClassInjector.doFog2Class(fileInput, fileOutput, mKey)
+                                mInjector.doFog2Class(fileInput, fileOutput, mKey)
                             }
                         }
                     }
@@ -152,10 +170,10 @@ class StringFogTransform extends Transform {
                             }
                         case Status.ADDED:
                         case Status.CHANGED:
-                            if (!mEnable) {
+                            if (!mEnable || mInjector == null) {
                                 Files.copy(jarInputFile, jarOutputFile)
                             } else {
-                                StringFogClassInjector.doFog2Jar(jarInputFile, jarOutputFile, mKey)
+                                mInjector.doFog2Jar(jarInputFile, jarOutputFile, mKey)
                             }
                             break
                         case Status.REMOVED:
@@ -170,7 +188,7 @@ class StringFogTransform extends Transform {
 
     }
 
-    private String getUniqueHashName(File fileInput) {
+    public String getUniqueHashName(File fileInput) {
         final String fileInputName = fileInput.getName()
         if (fileInput.isDirectory()) {
             return fileInputName

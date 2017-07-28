@@ -32,5 +32,7 @@ public class StringFogExtension {
 
     String key;
     boolean enable = true;
+    boolean debug = false;
+    String[] exclude;
 
 }

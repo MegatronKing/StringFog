@@ -1,1 +1,1 @@
-include ':stringfog-sample', ':stringfog-gradle-plugin', ':stringfog-lib'
+include ':stringfog-sample-app', ':stringfog-gradle-plugin', ':stringfog-lib', ':stringfog-sample-library'

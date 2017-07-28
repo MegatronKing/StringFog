@@ -10,7 +10,8 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/stringfog-gradle-plugin" />
             <option value="$PROJECT_DIR$/stringfog-lib" />
-            <option value="$PROJECT_DIR$/stringfog-sample" />
+            <option value="$PROJECT_DIR$/stringfog-sample-app" />
+            <option value="$PROJECT_DIR$/stringfog-sample-library" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

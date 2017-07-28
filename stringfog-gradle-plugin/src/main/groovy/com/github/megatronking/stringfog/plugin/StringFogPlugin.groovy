@@ -14,11 +14,13 @@
 
 package com.github.megatronking.stringfog.plugin
 
+import com.android.build.gradle.AppExtension
+import com.android.build.gradle.LibraryExtension
+import com.github.megatronking.stringfog.plugin.utils.Log
 import org.gradle.api.GradleException
-import org.gradle.api.Plugin;
+import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.UnknownTaskException;
-
+import org.gradle.api.UnknownTaskException
 /**
  * The plugin defines some tasks.
  *
@@ -30,12 +32,23 @@ public class StringFogPlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
-
         project.extensions.create('stringfog', StringFogExtension)
 
         def android = project.extensions.android
-        android.registerTransform(new StringFogTransform(project))
+        if (android instanceof AppExtension) {
+            applyApplication(project, android)
+        }
+        if (android instanceof LibraryExtension) {
+            applyLibrary(project, android)
+        }
 
+        project.afterEvaluate {
+            Log.setDebug(project.stringfog.debug)
+        }
+    }
+
+    private void applyApplication(Project project, def android) {
+        android.registerTransform(new StringFogTransformForApplication(project, android.applicationVariants))
         // throw an exception in instant run mode
         android.applicationVariants.all { variant ->
             def variantName = variant.name.capitalize()
@@ -53,4 +66,9 @@ public class StringFogPlugin implements Plugin<Project> {
             }
         }
     }
+
+    private void applyLibrary(Project project, def android) {
+        android.registerTransform(new StringFogTransformForLibrary(project, android.libraryVariants))
+    }
+
 }

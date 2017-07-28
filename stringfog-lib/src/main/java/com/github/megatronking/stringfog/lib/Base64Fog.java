@@ -18,16 +18,6 @@ import java.io.UnsupportedEncodingException;
 
 public final class Base64Fog {
 
-    public static final String DEFAULT_KEY = "StringFog";
-
-    public static String decode(String data) {
-        return decode(data, DEFAULT_KEY);
-    }
-
-    public static String encode(String data) {
-        return encode(data, DEFAULT_KEY);
-    }
-
     public static String encode(String data, String key) {
         String newData;
         try {

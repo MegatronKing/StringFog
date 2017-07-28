@@ -16,6 +16,7 @@ package com.github.megatronking.stringfog.plugin;
 
 import com.github.megatronking.stringfog.plugin.utils.TextUtils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +38,7 @@ public final class WhiteLists {
 
     static {
         // default packages in white list.
+        addWhiteList("com.github.megatronking.stringfog.lib", FLAG_PACKAGE);
         addWhiteList("android.support", FLAG_PACKAGE);
         addWhiteList("com.google", FLAG_PACKAGE);
         addWhiteList("com.facebook", FLAG_PACKAGE);
@@ -52,6 +54,8 @@ public final class WhiteLists {
         // default classes short name in white list.
         addWhiteList("BuildConfig", FLAG_CLASS);
         addWhiteList("R", FLAG_CLASS);
+        addWhiteList("R2", FLAG_CLASS);
+        addWhiteList("StringFog", FLAG_CLASS);
     }
 
     private WhiteLists() {
@@ -103,11 +107,11 @@ public final class WhiteLists {
     }
 
     private static String trueClassName(String className) {
-        return className.replace('/', '.');
+        return className.replace(File.separatorChar, '.');
     }
 
     private static String shortClassName(String className) {
-        String[] spiltArrays = className.split("/");
+        String[] spiltArrays = className.split(File.separator);
         return spiltArrays[spiltArrays.length - 1];
     }
 
