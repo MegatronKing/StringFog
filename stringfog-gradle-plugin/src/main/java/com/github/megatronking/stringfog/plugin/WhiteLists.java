@@ -111,7 +111,7 @@ public final class WhiteLists {
     }
 
     private static String shortClassName(String className) {
-        String[] spiltArrays = className.split(File.separator);
+        String[] spiltArrays = trueClassName(className).split("[.]");
         return spiltArrays[spiltArrays.length - 1];
     }
 
