@@ -64,7 +64,7 @@ public abstract class StringFogTransform extends Transform {
             variant.outputs.forEach { output ->
                 def processResources = output.processResources
                 processResources.doLast {
-                    def stringfogDir = applicationId.replace((char)'.', (char)File.separatorChar)
+                    def stringfogDir = applicationId.replace((char)'.', (char)'/')
                     def stringfogFile = new File(processResources.sourceOutputDir, stringfogDir + File.separator + "StringFog.java")
                     StringFogClassBuilder.buildStringFogClass(stringfogFile, processResources.sourceOutputDir,
                             applicationId, "StringFog", mKey)

@@ -20,8 +20,6 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 
-import java.io.File;
-
 /**
  * A factory creates {@link ClassVisitor}.
  *
@@ -53,7 +51,7 @@ public final class ClassVisitorFactory {
             return false;
         }
         for (String excludePackage : excludePackages) {
-            if (className.replace(File.separatorChar, '.').startsWith(excludePackage + ".")) {
+            if (className.replace('/', '.').startsWith(excludePackage + ".")) {
                 return true;
             }
         }

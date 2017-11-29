@@ -24,7 +24,6 @@ import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,13 +54,12 @@ public class StringFogClassVisitor extends ClassVisitor {
     public StringFogClassVisitor(String fogClassName, String key, ClassWriter cw) {
         super(Opcodes.ASM5, cw);
         this.mKey = key;
-        this.mFogClassName = fogClassName.replace('.', File.separatorChar);
+        this.mFogClassName = fogClassName.replace('.', '/');
     }
 
     @Override
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
         this.mClassName = name;
-//        System.out.println("processClass: " + mClassName);
         super.visit(version, access, name, signature, superName, interfaces);
     }
 

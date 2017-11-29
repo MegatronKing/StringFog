@@ -16,7 +16,6 @@ package com.github.megatronking.stringfog.plugin;
 
 import com.github.megatronking.stringfog.plugin.utils.TextUtils;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -107,7 +106,7 @@ public final class WhiteLists {
     }
 
     private static String trueClassName(String className) {
-        return className.replace(File.separatorChar, '.');
+        return className.replace('/', '.');
     }
 
     private static String shortClassName(String className) {
