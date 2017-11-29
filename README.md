@@ -32,7 +32,7 @@ buildscript {
     }
     dependencies {
         ...
-        classpath 'com.github.megatronking.stringfog:gradle-plugin:1.2.1'
+        classpath 'com.github.megatronking.stringfog:gradle-plugin:1.2.2'
     }
 }
 ```
@@ -49,7 +49,7 @@ stringfog {
 ```
 dependencies {
       ...
-      compile 'com.github.megatronking.stringfog:lib:1.2.1'
+      compile 'com.github.megatronking.stringfog:lib:1.2.2'
 }
 ```
 
@@ -82,6 +82,9 @@ public class Test {
 ```
 
 ## 更新日志
+
+### v1.2.2
+- 修复windows下打包后报错的bug
 
 ### v1.2.1
 - 修复windows下文件分隔符的bug
