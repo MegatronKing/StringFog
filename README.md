@@ -32,7 +32,7 @@ buildscript {
     }
     dependencies {
         ...
-        classpath 'com.github.megatronking.stringfog:gradle-plugin:1.2.0'
+        classpath 'com.github.megatronking.stringfog:gradle-plugin:1.2.1'
     }
 }
 ```
@@ -49,7 +49,7 @@ stringfog {
 ```
 dependencies {
       ...
-      compile 'com.github.megatronking.stringfog:lib:1.2.0'
+      compile 'com.github.megatronking.stringfog:lib:1.2.1'
 }
 ```
 
