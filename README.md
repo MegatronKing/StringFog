@@ -83,15 +83,15 @@ public class Test {
 
 ## 更新日志
 
+### v1.2.1
+- 修复windows下文件分隔符的bug
+- 修复applicationId和packageName不一致导致无法编译的bug
+- 优化功能，不需要再手动exclude已使用StringFog的库
+
 ### v1.2.0
 - 支持在library中使用，每个library可以使用不同key
 - 支持exclude指定包名不进行加密
 - 修复一些已知bug
-
-## v1.2.1
-- 修复windows下文件分隔符的bug
-- 修复applicationId和packageName不一致导致无法编译的bug
-- 优化功能，不需要再手动exclude已使用StringFog的库
 
 
 --------
