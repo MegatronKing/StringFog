@@ -1,7 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'stringfog'
 
-// 此Library使用了Fog，那么Application中需要手动exclude此库
 // 每个Library可以定义不同的加密key
 stringfog {
 
@@ -13,7 +12,7 @@ stringfog {
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.0"
+    buildToolsVersion '26'
 
     defaultConfig {
         minSdkVersion 15
@@ -38,6 +37,6 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.android.support:appcompat-v7:26.+'
-    compile 'com.github.megatronking.stringfog:lib:1.2.0'
+    compile 'com.github.megatronking.stringfog:lib:1.2.1'
     testCompile 'junit:junit:4.12'
 }

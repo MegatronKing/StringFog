@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         null_static = "test_null_static";
 
         // Test static block
-        Log.i("test", "test static block");
+        Log.i("stringfog", "test static block");
     }
 
     @Override

@@ -70,6 +70,7 @@ public final class StringFogClassInjector {
 
     @SuppressWarnings("NewApi")
     private void processJar(File jarIn, File jarOut, String key, Charset charsetIn, Charset charsetOut) throws IOException {
+        boolean shouldExclude = shouldExcludeJar(jarIn, charsetIn);
         ZipInputStream zis = null;
         ZipOutputStream zos = null;
         try {
@@ -84,7 +85,7 @@ public final class StringFogClassInjector {
                     entryOut.setCompressedSize(-1);
                     zos.putNextEntry(entryOut);
                     if (!entryIn.isDirectory()) {
-                        if (entryName.endsWith(".class")) {
+                        if (entryName.endsWith(".class") && !shouldExclude) {
                             processClass(zis, zos, key);
                         } else {
                             copy(zis, zos);
@@ -109,6 +110,22 @@ public final class StringFogClassInjector {
         classOut.flush();
     }
 
+    private boolean shouldExcludeJar(File jarIn, Charset charsetIn) throws IOException {
+        ZipInputStream zis = null;
+        try {
+            zis = new ZipInputStream(new BufferedInputStream(new FileInputStream(jarIn)), charsetIn);
+            ZipEntry entryIn;
+            while ((entryIn = zis.getNextEntry()) != null) {
+                final String entryName = entryIn.getName();
+                if (entryName != null && entryName.contains("StringFog")) {
+                    return true;
+                }
+            }
+        } finally {
+            closeQuietly(zis);
+        }
+        return false;
+    }
 
     private void closeQuietly(Closeable target) {
         if (target != null) {

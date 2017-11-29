@@ -5,13 +5,13 @@ stringfog {
     key 'Hello Application'
     enable true
     debug false
-    // 添加不使用Fog的包名，如果依赖的library已经使用了Fog，需要手动排除
-    exclude = ["com.github.megatronking.stringfog.exclude", "com.github.megatronking.stringfog.library"]
+    // 添加不使用Fog的包名
+    exclude = ["com.github.megatronking.stringfog.exclude"]
 }
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.0"
+    buildToolsVersion '26'
     defaultConfig {
         applicationId "com.github.megatronking.stringfog"
         minSdkVersion 15
@@ -34,7 +34,7 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.android.support:appcompat-v7:25.1.1'
-    compile 'com.github.megatronking.stringfog:lib:1.2.0'
+    compile 'com.github.megatronking.stringfog:lib:1.2.1'
     compile project(':stringfog-sample-library')
     testCompile 'junit:junit:4.12'
 }

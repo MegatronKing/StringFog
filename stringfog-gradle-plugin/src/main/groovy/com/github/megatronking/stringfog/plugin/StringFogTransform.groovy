@@ -41,30 +41,42 @@ public abstract class StringFogTransform extends Transform {
             }
             mEnable = project.stringfog.enable
             if (mEnable) {
-                createFogClass(variants)
-                createInjector(project.stringfog.exclude, variants)
+                def applicationId = variants.first().applicationId
+                def manifestFile = project.file("src/main/AndroidManifest.xml")
+                if (manifestFile.exists()) {
+                    def parsedManifest = new XmlParser().parse(
+                            new InputStreamReader(new FileInputStream(manifestFile), "utf-8"))
+                    if (parsedManifest != null) {
+                        def packageName = parsedManifest.attribute("package")
+                        if (packageName != null) {
+                            applicationId = packageName
+                        }
+                    }
+                }
+                createFogClass(variants, applicationId)
+                createInjector(project.stringfog.exclude, variants, applicationId)
             }
         }
     }
 
-    public void createFogClass(DomainObjectSet<BaseVariant> variants) {
+    public void createFogClass(DomainObjectSet<BaseVariant> variants, def applicationId) {
         variants.all { variant ->
             variant.outputs.forEach { output ->
                 def processResources = output.processResources
                 processResources.doLast {
-                    def stringfogDir = variant.applicationId.replace((char)'.', (char)File.separatorChar)
+                    def stringfogDir = applicationId.replace((char)'.', (char)File.separatorChar)
                     def stringfogFile = new File(processResources.sourceOutputDir, stringfogDir + File.separator + "StringFog.java")
                     StringFogClassBuilder.buildStringFogClass(stringfogFile, processResources.sourceOutputDir,
-                            variant.applicationId, "StringFog", mKey)
+                            applicationId, "StringFog", mKey)
                 }
             }
         }
     }
 
-    public void createInjector(String[] excludePackages, DomainObjectSet<BaseVariant> variants) {
+    public void createInjector(String[] excludePackages, DomainObjectSet<BaseVariant> variants, def applicationId) {
         variants.all { variant ->
             if (mInjector == null) {
-                mInjector = new StringFogClassInjector(excludePackages, variant.applicationId + ".StringFog")
+                mInjector = new StringFogClassInjector(excludePackages, applicationId + ".StringFog")
             }
             return true
         }
