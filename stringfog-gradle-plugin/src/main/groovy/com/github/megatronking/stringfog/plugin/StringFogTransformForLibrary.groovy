@@ -12,17 +12,17 @@ import org.gradle.api.Project
  * @since 17/7/28 12:28
  */
 
-public class StringFogTransformForLibrary extends StringFogTransform {
+class StringFogTransformForLibrary extends StringFogTransform {
 
-    public StringFogTransformForLibrary(Project project, DomainObjectSet<BaseVariant> variants) {
+    StringFogTransformForLibrary(Project project, DomainObjectSet<BaseVariant> variants) {
         super(project, variants)
     }
 
     @Override
-    public Set<QualifiedContent.Scope> getScopes() {
+    Set<QualifiedContent.Scope> getScopes() {
         return ImmutableSet.of(
                 QualifiedContent.Scope.PROJECT
-        );
+        )
     }
 
 }

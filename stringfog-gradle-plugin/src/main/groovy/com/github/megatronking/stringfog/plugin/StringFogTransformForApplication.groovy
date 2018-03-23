@@ -13,9 +13,9 @@ import org.gradle.api.Project
  * @since 17/7/28 12:28
  */
 
-public class StringFogTransformForApplication extends StringFogTransform {
+class StringFogTransformForApplication extends StringFogTransform {
 
-    public StringFogTransformForApplication(Project project, DomainObjectSet<BaseVariant> variants) {
+    StringFogTransformForApplication(Project project, DomainObjectSet<BaseVariant> variants) {
         super(project, variants);
     }
 

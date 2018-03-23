@@ -28,10 +28,10 @@ import org.gradle.api.UnknownTaskException
  * @since 2017/3/6 19:43
  */
 
-public class StringFogPlugin implements Plugin<Project> {
+class StringFogPlugin implements Plugin<Project> {
 
     @Override
-    public void apply(Project project) {
+    void apply(Project project) {
         project.extensions.create('stringfog', StringFogExtension)
 
         def android = project.extensions.android
@@ -47,7 +47,7 @@ public class StringFogPlugin implements Plugin<Project> {
         }
     }
 
-    private void applyApplication(Project project, def android) {
+    void applyApplication(Project project, def android) {
         android.registerTransform(new StringFogTransformForApplication(project, android.applicationVariants))
         // throw an exception in instant run mode
         android.applicationVariants.all { variant ->
@@ -67,7 +67,7 @@ public class StringFogPlugin implements Plugin<Project> {
         }
     }
 
-    private void applyLibrary(Project project, def android) {
+    void applyLibrary(Project project, def android) {
         android.registerTransform(new StringFogTransformForLibrary(project, android.libraryVariants))
     }
 

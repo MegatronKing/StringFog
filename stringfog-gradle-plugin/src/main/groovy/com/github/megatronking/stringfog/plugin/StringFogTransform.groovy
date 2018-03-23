@@ -24,7 +24,7 @@ import groovy.io.FileType
 import org.gradle.api.DomainObjectSet
 import org.gradle.api.Project
 
-public abstract class StringFogTransform extends Transform {
+abstract class StringFogTransform extends Transform {
 
     private static final String TRANSFORM_NAME = 'stringFog'
 
@@ -33,7 +33,7 @@ public abstract class StringFogTransform extends Transform {
 
     protected StringFogClassInjector mInjector;
 
-    public StringFogTransform(Project project, DomainObjectSet<BaseVariant> variants) {
+    StringFogTransform(Project project, DomainObjectSet<BaseVariant> variants) {
         project.afterEvaluate {
             mKey = project.stringfog.key
             if (mKey == null || mKey.length() == 0) {
@@ -59,7 +59,7 @@ public abstract class StringFogTransform extends Transform {
         }
     }
 
-    public void createFogClass(DomainObjectSet<BaseVariant> variants, def applicationId) {
+    void createFogClass(DomainObjectSet<BaseVariant> variants, def applicationId) {
         variants.all { variant ->
             variant.outputs.forEach { output ->
                 def processResources = output.processResources
@@ -73,7 +73,7 @@ public abstract class StringFogTransform extends Transform {
         }
     }
 
-    public void createInjector(String[] excludePackages, DomainObjectSet<BaseVariant> variants, def applicationId) {
+    void createInjector(String[] excludePackages, DomainObjectSet<BaseVariant> variants, def applicationId) {
         variants.all { variant ->
             if (mInjector == null) {
                 mInjector = new StringFogClassInjector(excludePackages, applicationId + ".StringFog")
@@ -83,12 +83,12 @@ public abstract class StringFogTransform extends Transform {
     }
 
     @Override
-    public String getName() {
+    String getName() {
         return TRANSFORM_NAME
     }
 
     @Override
-    public Set<QualifiedContent.ContentType> getInputTypes() {
+    Set<QualifiedContent.ContentType> getInputTypes() {
         return ImmutableSet.of(QualifiedContent.DefaultContentType.CLASSES)
     }
 
@@ -103,7 +103,7 @@ public abstract class StringFogTransform extends Transform {
     }
 
     @Override
-    public void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
+    void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
         def dirInputs = new HashSet<>()
         def jarInputs = new HashSet<>()
 
@@ -205,7 +205,7 @@ public abstract class StringFogTransform extends Transform {
 
     }
 
-    public String getUniqueHashName(File fileInput) {
+    String getUniqueHashName(File fileInput) {
         final String fileInputName = fileInput.getName()
         if (fileInput.isDirectory()) {
             return fileInputName
@@ -217,4 +217,5 @@ public abstract class StringFogTransform extends Transform {
                 (extSepPos >= 0 ? fileInputName.substring(0, extSepPos) : fileInputName)
         return fileInputNamePrefix + '_' + pathMD5
     }
+
 }
