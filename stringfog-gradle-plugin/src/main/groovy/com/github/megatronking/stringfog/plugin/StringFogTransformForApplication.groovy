@@ -20,14 +20,22 @@ public class StringFogTransformForApplication extends StringFogTransform {
     }
 
     @Override
-    public Set<QualifiedContent.Scope> getScopes() {
-        return ImmutableSet.of(
-                QualifiedContent.Scope.PROJECT,
-                QualifiedContent.Scope.SUB_PROJECTS,
-                QualifiedContent.Scope.PROJECT_LOCAL_DEPS,
-                QualifiedContent.Scope.SUB_PROJECTS_LOCAL_DEPS,
-                QualifiedContent.Scope.EXTERNAL_LIBRARIES
-        );
+    Set<QualifiedContent.Scope> getScopes() {
+        def name = QualifiedContent.Scope.PROJECT_LOCAL_DEPS.name()
+        def deprecated = QualifiedContent.Scope.PROJECT_LOCAL_DEPS.getClass()
+                .getField(name).getAnnotation(Deprecated.class)
+
+        if (deprecated == null) {
+            return ImmutableSet.<QualifiedContent.Scope> of(QualifiedContent.Scope.PROJECT
+                    , QualifiedContent.Scope.PROJECT_LOCAL_DEPS
+                    , QualifiedContent.Scope.EXTERNAL_LIBRARIES
+                    , QualifiedContent.Scope.SUB_PROJECTS
+                    , QualifiedContent.Scope.SUB_PROJECTS_LOCAL_DEPS)
+        } else {
+            return ImmutableSet.<QualifiedContent.Scope> of(QualifiedContent.Scope.PROJECT
+                    , QualifiedContent.Scope.EXTERNAL_LIBRARIES
+                    , QualifiedContent.Scope.SUB_PROJECTS)
+        }
     }
 
 }

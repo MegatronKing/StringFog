@@ -93,6 +93,11 @@ public abstract class StringFogTransform extends Transform {
     }
 
     @Override
+    Set<QualifiedContent.Scope> getScopes() {
+        return null
+    }
+
+    @Override
     boolean isIncremental() {
         return true
     }
