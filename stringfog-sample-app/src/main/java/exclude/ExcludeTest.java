@@ -1,4 +1,4 @@
-package com.github.megatronking.stringfog.exclude;
+package exclude;
 
 /**
  * A testcase about exclude in stringfog DSL.

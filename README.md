@@ -32,7 +32,7 @@ buildscript {
     }
     dependencies {
         ...
-        classpath 'com.github.megatronking.stringfog:gradle-plugin:1.3.0'
+        classpath 'com.github.megatronking.stringfog:gradle-plugin:1.4.0'
     }
 }
 ```
@@ -43,6 +43,7 @@ apply plugin: 'stringfog'
 stringfog {
     key 'Hello World'  // 这是加解密key，可以自由定义
     enable true // 开关
+    fogPackages = ['com.xxx.xxx'] // 指定某些包下面的类进行加密
 }
 ```
 ##### 3、在app的build.gradle中引入加解密库依赖
@@ -54,26 +55,7 @@ dependencies {
 ```
 
 ### 补充
-由于没有必要对dex中所有字符串加密，所以我们采取了白名单机制，对于以下常用的库和类，处理过程中会自动忽略：
-```
-// default packages in white list.
-addWhiteList("android.support", FLAG_PACKAGE);
-addWhiteList("com.google", FLAG_PACKAGE);
-addWhiteList("com.facebook", FLAG_PACKAGE);
-addWhiteList("com.baidu", FLAG_PACKAGE);
-addWhiteList("com.alipay", FLAG_PACKAGE);
-addWhiteList("com.alibaba", FLAG_PACKAGE);
-addWhiteList("com.tencent", FLAG_PACKAGE);
-addWhiteList("de.greenrobot", FLAG_PACKAGE);
-addWhiteList("com.qq", FLAG_PACKAGE);
-addWhiteList("rx", FLAG_PACKAGE);
-addWhiteList("com.squareup", FLAG_PACKAGE);
-
-// default short class names in white list.
-addWhiteList("BuildConfig", FLAG_CLASS);
-addWhiteList("R", FLAG_CLASS);
-```
-当然，如果开发者有不需要自动加密的类，可以使用注解StringFogIgnore来忽略：
+如果开发者有不需要自动加密的类，可以使用注解StringFogIgnore来忽略：
 ```
 @StringFogIgnore
 public class Test {
@@ -82,6 +64,10 @@ public class Test {
 ```
 
 ## 更新日志
+
+### v1.4.0
+- 新增指定包名加密的配置项：fogPackages
+- 移除指定包名不加密的配置项：exclude
 
 ### v1.3.0
 - 修复gradle 3.0+编译报错的bug

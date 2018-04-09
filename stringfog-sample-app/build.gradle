@@ -5,8 +5,8 @@ stringfog {
     key 'Hello Application'
     enable true
     debug false
-    // 添加不使用Fog的包名
-    exclude = ["com.github.megatronking.stringfog.exclude"]
+    // 添加使用Fog的包名
+    fogPackages = ["com.github.megatronking.stringfog"]
 }
 
 android {
