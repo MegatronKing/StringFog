@@ -30,9 +30,9 @@ package com.github.megatronking.stringfog.plugin;
 
 public class StringFogExtension {
 
-    String key;
-    boolean enable = true;
-    boolean debug = false;
-    String[] exclude;
+    String key
+    boolean enable = true
+    boolean debug = false
+    String[] fogPackages = []
 
 }

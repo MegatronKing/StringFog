@@ -9,7 +9,9 @@ public class Log {
     }
 
     public static void v(String msg) {
-        System.out.println(msg);
+        if (isDebug) {
+            System.out.println(msg);
+        }
     }
 
 }

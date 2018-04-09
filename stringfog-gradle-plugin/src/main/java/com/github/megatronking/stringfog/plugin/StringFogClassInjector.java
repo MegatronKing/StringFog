@@ -35,11 +35,11 @@ import java.util.zip.ZipOutputStream;
 
 public final class StringFogClassInjector {
 
-    public String[] mExcludePackages;
+    public String[] mFogPackages;
     public String mFogClassName;
 
-    public StringFogClassInjector(String[] excludePackages, String fogClassName) {
-        this.mExcludePackages = excludePackages;
+    public StringFogClassInjector(String[] fogPackages, String fogClassName) {
+        this.mFogPackages = fogPackages;
         this.mFogClassName = fogClassName;
     }
 
@@ -104,7 +104,7 @@ public final class StringFogClassInjector {
     private void processClass(InputStream classIn, OutputStream classOut, String key) throws IOException {
         ClassReader cr = new ClassReader(classIn);
         ClassWriter cw = new ClassWriter(0);
-        ClassVisitor cv = ClassVisitorFactory.create(mExcludePackages, mFogClassName, cr.getClassName(), key, cw);
+        ClassVisitor cv = ClassVisitorFactory.create(mFogPackages, mFogClassName, cr.getClassName(), key, cw);
         cr.accept(cv, 0);
         classOut.write(cw.toByteArray());
         classOut.flush();

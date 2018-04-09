@@ -28,10 +28,10 @@ abstract class StringFogTransform extends Transform {
 
     private static final String TRANSFORM_NAME = 'stringFog'
 
-    protected String mKey;
-    protected boolean mEnable;
+    protected String mKey
+    protected boolean mEnable
 
-    protected StringFogClassInjector mInjector;
+    protected StringFogClassInjector mInjector
 
     StringFogTransform(Project project, DomainObjectSet<BaseVariant> variants) {
         project.afterEvaluate {
@@ -54,7 +54,7 @@ abstract class StringFogTransform extends Transform {
                     }
                 }
                 createFogClass(variants, applicationId)
-                createInjector(project.stringfog.exclude, variants, applicationId)
+                createInjector(project.stringfog.fogPackages, variants, applicationId)
             }
         }
     }
@@ -73,10 +73,10 @@ abstract class StringFogTransform extends Transform {
         }
     }
 
-    void createInjector(String[] excludePackages, DomainObjectSet<BaseVariant> variants, def applicationId) {
+    void createInjector(String[] fogPackages, DomainObjectSet<BaseVariant> variants, def applicationId) {
         variants.all { variant ->
             if (mInjector == null) {
-                mInjector = new StringFogClassInjector(excludePackages, applicationId + ".StringFog")
+                mInjector = new StringFogClassInjector(fogPackages, applicationId + ".StringFog")
             }
             return true
         }

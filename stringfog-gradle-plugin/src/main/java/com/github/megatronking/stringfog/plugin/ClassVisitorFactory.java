@@ -14,6 +14,7 @@
 package com.github.megatronking.stringfog.plugin;
 
 
+import com.github.megatronking.stringfog.plugin.utils.Log;
 import com.github.megatronking.stringfog.plugin.utils.TextUtils;
 
 import org.objectweb.asm.ClassVisitor;
@@ -32,10 +33,9 @@ public final class ClassVisitorFactory {
     private ClassVisitorFactory() {
     }
 
-    public static ClassVisitor create(String[] excludePackages, String fogClassName, String className, String key, ClassWriter cw) {
-        if (WhiteLists.inWhiteList(className, WhiteLists.FLAG_PACKAGE)
-                || WhiteLists.inWhiteList(className, WhiteLists.FLAG_CLASS) || isInExcludePackages(excludePackages, className)) {
-            System.out.println("StringFog Ignore: " + className);
+    public static ClassVisitor create(String[] fogPackages, String fogClassName, String className, String key, ClassWriter cw) {
+        if (WhiteLists.inWhiteList(className) || !isInFogPackages(fogPackages, className)) {
+            Log.v("StringFog Ignore: " + className);
             return createEmpty(cw);
         }
         return new StringFogClassVisitor(fogClassName, key, cw);
@@ -46,12 +46,16 @@ public final class ClassVisitorFactory {
         };
     }
 
-    private static boolean isInExcludePackages(String[] excludePackages, String className) {
-        if (excludePackages == null || excludePackages.length == 0 || TextUtils.isEmpty(className)) {
+    private static boolean isInFogPackages(String[] fogPackages, String className) {
+        if (TextUtils.isEmpty(className)) {
             return false;
         }
-        for (String excludePackage : excludePackages) {
-            if (className.replace('/', '.').startsWith(excludePackage + ".")) {
+        if (fogPackages == null || fogPackages.length == 0) {
+            // default we fog all packages.
+            return true;
+        }
+        for (String fogPackage : fogPackages) {
+            if (className.replace('/', '.').startsWith(fogPackage + ".")) {
                 return true;
             }
         }
