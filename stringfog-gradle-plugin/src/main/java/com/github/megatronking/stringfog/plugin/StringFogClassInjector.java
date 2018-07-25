@@ -82,6 +82,10 @@ public final class StringFogClassInjector {
                 final String entryName = entryIn.getName();
                 if (!processedEntryNamesMap.containsKey(entryName)) {
                     ZipEntry entryOut = new ZipEntry(entryIn);
+                    // Set compress method to default, fixed #12
+                    if (entryOut.getMethod() != ZipEntry.DEFLATED) {
+                        entryOut.setMethod(ZipEntry.DEFLATED);
+                    }
                     entryOut.setCompressedSize(-1);
                     zos.putNextEntry(entryOut);
                     if (!entryIn.isDirectory()) {
