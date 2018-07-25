@@ -32,7 +32,7 @@ buildscript {
     }
     dependencies {
         ...
-        classpath 'com.github.megatronking.stringfog:gradle-plugin:1.4.0'
+        classpath 'com.github.megatronking.stringfog:gradle-plugin:1.4.1'
     }
 }
 ```
@@ -64,6 +64,9 @@ public class Test {
 ```
 
 ## 更新日志
+
+### v1.4.1
+- 修复使用Java 8时出现的ZipException编译错误
 
 ### v1.4.0
 - 新增指定包名加密的配置项：fogPackages
