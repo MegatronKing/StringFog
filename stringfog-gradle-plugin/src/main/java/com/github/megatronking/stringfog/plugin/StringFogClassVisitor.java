@@ -114,7 +114,7 @@ public class StringFogClassVisitor extends ClassVisitor {
                         super.visitCode();
                         // Here init static final fields.
                         for (ClassStringField field : mStaticFinalFields) {
-                            if (field.value == null) {
+                            if (!canEncrypted(field.value)) {
                                 continue;
                             }
                             super.visitLdcInsn(Base64Fog.encode(field.value, mKey));
@@ -126,7 +126,7 @@ public class StringFogClassVisitor extends ClassVisitor {
                     @Override
                     public void visitLdcInsn(Object cst) {
                         // Here init static or static final fields, but we must check field name int 'visitFieldInsn'
-                        if (cst != null && cst instanceof String && !TextUtils.isEmptyAfterTrim((String) cst)) {
+                        if (cst != null && cst instanceof String && !canEncrypted((String) cst)) {
                             lastStashCst = (String) cst;
                             super.visitLdcInsn(Base64Fog.encode(lastStashCst, mKey));
                             super.visitMethodInsn(Opcodes.INVOKESTATIC, mFogClassName, "decode", "(Ljava/lang/String;)Ljava/lang/String;", false);
@@ -166,7 +166,7 @@ public class StringFogClassVisitor extends ClassVisitor {
                     @Override
                     public void visitLdcInsn(Object cst) {
                         // We don't care about whether the field is final or normal
-                        if (cst != null && cst instanceof String && !TextUtils.isEmptyAfterTrim((String) cst)) {
+                        if (cst != null && cst instanceof String && !canEncrypted((String) cst)) {
                             super.visitLdcInsn(Base64Fog.encode((String) cst, mKey));
                             super.visitMethodInsn(Opcodes.INVOKESTATIC, mFogClassName, "decode", "(Ljava/lang/String;)Ljava/lang/String;", false);
                         } else {
@@ -179,7 +179,7 @@ public class StringFogClassVisitor extends ClassVisitor {
 
                     @Override
                     public void visitLdcInsn(Object cst) {
-                        if (cst != null && cst instanceof String && !TextUtils.isEmptyAfterTrim((String) cst)) {
+                        if (cst != null && cst instanceof String && !canEncrypted((String) cst)) {
                             // If the value is a static final field
                             for (ClassStringField field : mStaticFinalFields) {
                                 if (cst.equals(field.value)) {
@@ -217,8 +217,8 @@ public class StringFogClassVisitor extends ClassVisitor {
             mv.visitCode();
             // Here init static final fields.
             for (ClassStringField field : mStaticFinalFields) {
-                if (field.value == null) {
-                    continue; // It could not be happened
+                if (!canEncrypted(field.value)) {
+                    continue;
                 }
                 mv.visitLdcInsn(Base64Fog.encode(field.value, mKey));
                 mv.visitMethodInsn(Opcodes.INVOKESTATIC, mFogClassName, "decode", "(Ljava/lang/String;)Ljava/lang/String;", false);
@@ -230,4 +230,10 @@ public class StringFogClassVisitor extends ClassVisitor {
         }
         super.visitEnd();
     }
+
+    private boolean canEncrypted(String value) {
+        // Max string length is 65535, then before Base64 encode, it should be less than 65535 * 3/4
+        return !TextUtils.isEmptyAfterTrim(value) && value.length() < 65535 * 0.75f;
+    }
+
 }
