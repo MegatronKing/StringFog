@@ -35,9 +35,10 @@ public final class ClassVisitorFactory {
 
     public static ClassVisitor create(String[] fogPackages, String fogClassName, String className, String key, ClassWriter cw) {
         if (WhiteLists.inWhiteList(className) || !isInFogPackages(fogPackages, className)) {
-            Log.v("StringFog Ignore: " + className);
+            Log.v("StringFog ignore: " + className);
             return createEmpty(cw);
         }
+        Log.v("StringFog execute: " + className);
         return new StringFogClassVisitor(fogClassName, key, cw);
     }
 
