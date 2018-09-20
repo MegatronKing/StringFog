@@ -141,15 +141,12 @@ public final class StringFogClassInjector {
         }
     }
 
-    private int copy(InputStream in, OutputStream out) throws IOException {
-        int total = 0;
+    private void copy(InputStream in, OutputStream out) throws IOException {
         byte[] buffer = new byte[8192];
         int c;
         while ((c = in.read(buffer)) != -1) {
-            total += c;
             out.write(buffer, 0, c);
         }
-        return total;
     }
 
 }
