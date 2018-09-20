@@ -12,8 +12,6 @@ stringfog {
 
 android {
     compileSdkVersion 26
-    buildToolsVersion '26'
-
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 26
