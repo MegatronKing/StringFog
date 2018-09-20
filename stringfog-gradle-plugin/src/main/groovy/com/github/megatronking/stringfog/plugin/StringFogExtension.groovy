@@ -34,5 +34,6 @@ public class StringFogExtension {
     boolean enable = true
     boolean debug = false
     String[] fogPackages = []
+    String implementation
 
 }

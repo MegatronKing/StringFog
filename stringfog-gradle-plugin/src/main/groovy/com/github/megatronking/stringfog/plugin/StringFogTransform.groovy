@@ -29,6 +29,7 @@ abstract class StringFogTransform extends Transform {
     private static final String TRANSFORM_NAME = 'stringFog'
 
     protected String mKey
+    protected String mImplementation
     protected boolean mEnable
 
     protected StringFogClassInjector mInjector
@@ -38,6 +39,10 @@ abstract class StringFogTransform extends Transform {
             mKey = project.stringfog.key
             if (mKey == null || mKey.length() == 0) {
                 throw new IllegalArgumentException("Key of stringfog can not be empty!");
+            }
+            mImplementation = project.stringfog.implementation
+            if (mImplemetation == null) {
+                throw new IllegalArgumentException("Missing implementation config.")
             }
             mEnable = project.stringfog.enable
             if (mEnable) {
