@@ -20,11 +20,11 @@ package com.github.megatronking.stringfog.plugin;
  * @since 2017/3/7 10:54
  */
 
-public class ClassStringField {
+/* package */ class ClassStringField {
 
     public static final String STRING_DESC = "Ljava/lang/String;";
 
-    public ClassStringField(String name, String value) {
+    /* package */ ClassStringField(String name, String value) {
         this.name = name;
         this.value = value;
     }

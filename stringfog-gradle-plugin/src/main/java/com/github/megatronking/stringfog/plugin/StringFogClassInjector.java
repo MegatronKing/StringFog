@@ -35,8 +35,8 @@ import java.util.zip.ZipOutputStream;
 
 public final class StringFogClassInjector {
 
-    public String[] mFogPackages;
-    public String mFogClassName;
+    private String[] mFogPackages;
+    private String mFogClassName;
 
     public StringFogClassInjector(String[] fogPackages, String fogClassName) {
         this.mFogPackages = fogPackages;
