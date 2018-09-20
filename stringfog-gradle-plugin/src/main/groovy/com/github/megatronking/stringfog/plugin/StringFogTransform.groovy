@@ -38,11 +38,11 @@ abstract class StringFogTransform extends Transform {
         project.afterEvaluate {
             mKey = project.stringfog.key
             if (mKey == null || mKey.length() == 0) {
-                throw new IllegalArgumentException("Key of stringfog can not be empty!");
+                throw new IllegalArgumentException("Missing stringfog key config")
             }
             mImplementation = project.stringfog.implementation
             if (mImplemetation == null) {
-                throw new IllegalArgumentException("Missing implementation config.")
+                throw new IllegalArgumentException("Missing stringfog implementation config")
             }
             mEnable = project.stringfog.enable
             if (mEnable) {
