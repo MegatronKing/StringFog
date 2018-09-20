@@ -30,9 +30,11 @@ import org.gradle.api.UnknownTaskException
 
 class StringFogPlugin implements Plugin<Project> {
 
+    private static final String PLUGIN_NAME = 'stringfog'
+
     @Override
     void apply(Project project) {
-        project.extensions.create('stringfog', StringFogExtension)
+        project.extensions.create(PLUGIN_NAME, StringFogExtension)
 
         def android = project.extensions.android
         if (android instanceof AppExtension) {
