@@ -6,7 +6,7 @@ stringfog {
 
     key 'Hello Library'
     enable true
-    debug true
+    debug false
     implementation 'com.github.megatronking.stringfog.xor.StringFogImpl'
 }
 
