@@ -35,6 +35,6 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.android.support:appcompat-v7:26.+'
-    compile 'com.github.megatronking.stringfog:base64:1.0.0'
+    compile 'com.github.megatronking.stringfog:xor:1.0.0'
     testCompile 'junit:junit:4.12'
 }
