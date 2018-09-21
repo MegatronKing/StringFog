@@ -95,7 +95,7 @@ public class StringFogClassVisitor extends ClassVisitor {
 
             // normal, in this condition, the value is null.
             if ((access & Opcodes.ACC_STATIC) != 0 && (access & Opcodes.ACC_FINAL) != 0) {
-                ac.add(new ClassStringField(name, (String) value));
+                mFields.add(new ClassStringField(name, (String) value));
                 value = null;
             }
         }
