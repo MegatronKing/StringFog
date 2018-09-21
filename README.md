@@ -84,7 +84,7 @@ public class Test {
 }
 ```
 - 自定义加解密算法扩展：
-实现IStringFog接口，然后替换掉上面的xor算法，参考stringfog-ext目录下面的两种算法实现。
+实现IStringFog接口，然后替换掉上面的xor算法库依赖，参考stringfog-ext目录下面的两种算法实现。
 ```
 public final class StringFogImpl implements IStringFog {
 
