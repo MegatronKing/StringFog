@@ -7,7 +7,7 @@ stringfog {
     key 'Hello Library'
     enable true
     debug true
-    implementation 'com.github.megatronking.stringfog.base64.StringFogImpl'
+    implementation 'com.github.megatronking.stringfog.xor.StringFogImpl'
 }
 
 android {

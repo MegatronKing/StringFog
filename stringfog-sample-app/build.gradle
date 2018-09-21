@@ -5,7 +5,7 @@ stringfog {
     key 'Hello Application'
     enable true
     debug false
-    implementation 'com.github.megatronking.stringfog.base64.StringFogImpl'
+    implementation 'com.github.megatronking.stringfog.xor.StringFogImpl'
     // 添加使用Fog的包名
     fogPackages = ["com.github.megatronking.stringfog"]
 }
@@ -34,7 +34,7 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.android.support:appcompat-v7:25.1.1'
-    compile 'com.github.megatronking.stringfog:base64:1.0.0'
+    compile 'com.github.megatronking.stringfog:aes-cbc:1.0.0'
     compile project(':stringfog-sample-library')
     testCompile 'junit:junit:4.12'
 }
