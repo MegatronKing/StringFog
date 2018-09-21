@@ -1,30 +1,40 @@
 
 # StringFog
-一款自动对dex文件中的字符串进行加密Android插件工具，正如名字所言，给字符串加上一层雾霭，使人难以窥视其真面目，且支持在app和sdk中独立使用。
+一款自动对dex/aar/jar文件中的字符串进行加密Android插件工具，正如名字所言，给字符串加上一层雾霭，使人难以窥视其真面目。
 
+- 支持app打包生成的apk加密。
+- 支持aar和jar等库文件加密。
+- 支持加解密算法的自主扩展。
+- 支持配置可选代码加密。
+- 完全Gradle自动化集成。
+- 不支持InstantRun。
 
 ### 原理
-在java文件编译成class字节码后，class字节码压缩成dex文件前，利用ASM库对class字节码中的字符串进行加密，同时将解密调用自动写进class字节码中，做到在运行时还原字符串内容，举个栗子：
-- 原文：
+
+![](https://github.com/MegatronKing/StringFog/blob/master/assets/flow.png)<br>
+
+- 加密前：
 ```
 String a = "This is a string!";
 ```
-- 加密：
+
+- 加密后：
 ```
-String a = Decoder.decode("ABCDEFGHIJKLMN");
+String a = StringFog.decrypt("ABCDEFGHIJKLMN");
 ```
-### 优缺点
-将dex中的字符串进行加密，可以提高反编译的难度，对于类似appId、appKey等敏感字符串，进行自动加密后，逆向应用时在使用jadx这一类反编译工具定位查找这些字符串的难度将加大，比如微信的appId前缀是"wx"，不加密基本上直接就可以搜索定位出来。当然，这里需要声明一点，没有绝对的安全，由于解密Key和算法是同样写在dex里面的，逆向时处理一下是可以还原出字符串内容的。另外，在运行时解密字符串会相应地降低性能，不过由于算法简单，影响不大。<br>不支持Instant Run
-### 演示
-加密前：<br>
-![](https://github.com/MegatronKing/StringFog/blob/master/assets/before.png)<br>
-加密后：<br>
-![](https://github.com/MegatronKing/StringFog/blob/master/assets/after.png)<br>
+
+- 运行时：
+```
+decrypt: "ABCDEFGHIJKLMN" => "This is a string!"
+```
+
+### 混淆
+StringFog和混淆完全不冲突，也不需要配置反混淆，实际上StringFog配上混淆效果会更好！
 
 ### 使用
 由于开发了gradle插件，所以在集成时非常简单，不会影响到打包的配置。插件已经上传到jcenter，直接引用依赖就可以。
 
-##### 1、在根目录build.gradle中引入插件依赖
+##### 1、在根目录build.gradle中引入插件依赖。
 ```
 buildscript {
     repositories {
@@ -32,38 +42,82 @@ buildscript {
     }
     dependencies {
         ...
-        classpath 'com.github.megatronking.stringfog:gradle-plugin:1.4.1'
+        classpath 'com.github.megatronking.stringfog:gradle-plugin:2.0.0'
+        // 选用加解密算法库，默认实现了xor和aes-cbc两种简单算法，也可以使用自己的加解密库。
+        classpath 'com.github.megatronking.stringfog:xor:1.0.0'
     }
 }
 ```
-##### 2、在app的build.gradle中配置插件
+
+##### 2、在app或lib的build.gradle中配置插件。
 ```
 apply plugin: 'stringfog'
 
 stringfog {
-    key 'Hello World'  // 这是加解密key，可以自由定义
-    enable true // 开关
-    fogPackages = ['com.xxx.xxx'] // 指定某些包下面的类进行加密
-}
-```
-##### 3、在app的build.gradle中引入加解密库依赖
-```
-dependencies {
-      ...
-      compile 'com.github.megatronking.stringfog:lib:1.2.2'
+    // 这是加解密key，可以自由定义。
+    key 'Hello World'
+    // 开关
+    enable true
+    // 加解密库的实现类路径，需和上面配置的加解密算法库一致。
+    implementation 'com.github.megatronking.stringfog.xor.StringFogImpl'
+    // 指定需加密的代码包路径，可配置多个，未指定将默认全部加密。
+    fogPackages = ['com.xxx.xxx']
 }
 ```
 
-### 补充
-如果开发者有不需要自动加密的类，可以使用注解StringFogIgnore来忽略：
+##### 3、在appapp或lib的build.gradle中引入加解密库依赖。
+```
+dependencies {
+      ...
+      // 这里要和上面选用的加解密算法库一致，用于运行时解密。
+      compile 'com.github.megatronking.stringfog:xor:1.0.0'
+}
+```
+
+### 扩展
+
+- 如果开发者有不需要自动加密的类，可以使用注解StringFogIgnore来忽略：
 ```
 @StringFogIgnore
 public class Test {
     ...
 }
 ```
+- 自定义加解密算法扩展：
+实现IStringFog接口，然后替换掉上面的xor算法，参考stringfog-ext目录下面的两种算法实现。
+```
+public final class StringFogImpl implements IStringFog {
+
+    @Override
+    public String encrypt(String data, String key) {
+        // 自定义加密
+    }
+
+    @Override
+    public String decrypt(String data, String key) {
+        // 自定义解密
+    }
+
+    @Override
+    public boolean overflow(String data, String key) {
+        // 最大字符串长度为65536，这里要校验加密后是否出现长度溢出，如果溢出将不进行加密。
+        // 这里可以控制符合某些条件的字符串不加密。
+    }
+
+}
+
+```
+
+- 加解密的字符串明文和暗文会自动生成mapping映射文件，位于outputs/mapping/stringfog.txt。
+
 
 ## 更新日志
+
+### v2.0.0
+- 修改gradle配置（必须配置implementation）。
+- 修复大字符串编译失败的问题。
+- 新增自定义加解密算法扩展。
+- 新增生成mapping映射表文件。
 
 ### v1.4.1
 - 修复使用Java 8时出现的ZipException编译错误
