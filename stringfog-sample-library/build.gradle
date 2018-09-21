@@ -6,8 +6,8 @@ stringfog {
 
     key 'Hello Library'
     enable true
-    debug false
-
+    debug true
+    implementation 'com.github.megatronking.stringfog.base64.StringFogImpl'
 }
 
 android {
@@ -35,6 +35,6 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.android.support:appcompat-v7:26.+'
-    compile 'com.github.megatronking.stringfog:lib:1.2.2'
+    compile 'com.github.megatronking.stringfog:base64:1.0.0'
     testCompile 'junit:junit:4.12'
 }

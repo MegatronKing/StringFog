@@ -1,6 +1,6 @@
 package com.github.megatronking.stringfog;
 
-import com.github.megatronking.stringfog.lib.annotation.StringFogIgnore;
+import com.github.megatronking.stringfog.annotation.StringFogIgnore;
 
 /**
  * Test StringFogIgnore

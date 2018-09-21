@@ -1,5 +1,5 @@
 apply plugin: 'groovy'
-//apply plugin: 'maven'
+apply plugin: 'maven'
 
 dependencies {
     compile gradleApi()
@@ -7,7 +7,7 @@ dependencies {
     compile 'com.android.tools.build:gradle:2.2.0'
     compile 'org.ow2.asm:asm-all:5.0.4'
     compile 'com.squareup:javapoet:1.9.0'
-    compile project(':stringfog-lib')
+    compile project(':stringfog-interface')
 }
 
 sourceSets {
@@ -28,13 +28,13 @@ version=VERSION
 
 [compileJava, compileGroovy, javadoc]*.options*.encoding = 'UTF-8'
 
-//uploadArchives {
-//    repositories {
-//        mavenDeployer {
-//            repository(url: uri('../maven'))
-//        }
-//    }
-//}
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: uri('../maven'))
+        }
+    }
+}
 
 //apply from: '../bintray_java.gradle'
 //apply from: '../nexus_java.gradle'

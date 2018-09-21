@@ -5,6 +5,7 @@ stringfog {
     key 'Hello Application'
     enable true
     debug false
+    implementation 'com.github.megatronking.stringfog.base64.StringFogImpl'
     // 添加使用Fog的包名
     fogPackages = ["com.github.megatronking.stringfog"]
 }
@@ -21,7 +22,7 @@ android {
     }
     buildTypes {
         debug {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -33,7 +34,7 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.android.support:appcompat-v7:25.1.1'
-    compile 'com.github.megatronking.stringfog:lib:1.2.2'
+    compile 'com.github.megatronking.stringfog:base64:1.0.0'
     compile project(':stringfog-sample-library')
     testCompile 'junit:junit:4.12'
 }
