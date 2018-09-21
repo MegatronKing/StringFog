@@ -54,7 +54,7 @@ public final class StringFogClassGenerator {
                 Modifier.FINAL));
 
         javaWriter.emitField(implementationSimpleClassName, "IMPL",
-                ImmutableSet.of(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL),
+                ImmutableSet.of(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL),
                 "new " + implementationSimpleClassName + "()");
 
         javaWriter.emitEmptyLine();
