@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.megatronking.stringfog.base64;
+package com.github.megatronking.stringfog;
 
 /**
  * Utilities for encoding and decoding the Base64 representation of
