@@ -22,5 +22,5 @@ version=VERSION
 //    }
 //}
 
-//apply from: '../bintray_java.gradle'
-//apply from: '../nexus_java.gradle'
+//apply from: "$rootDir/bintray_java.gradle"
+//apply from: "$rootDir/nexus_java.gradle"
