@@ -26,6 +26,7 @@ import org.gradle.api.Project
 
 abstract class StringFogTransform extends Transform {
 
+    public static final String FOG_CLASS_NAME = 'StringFog'
     private static final String TRANSFORM_NAME = 'stringFog'
 
     protected String mKey
@@ -41,7 +42,7 @@ abstract class StringFogTransform extends Transform {
                 throw new IllegalArgumentException("Missing stringfog key config")
             }
             mImplementation = project.stringfog.implementation
-            if (mImplemetation == null) {
+            if (mImplementation == null) {
                 throw new IllegalArgumentException("Missing stringfog implementation config")
             }
             mEnable = project.stringfog.enable
@@ -71,8 +72,8 @@ abstract class StringFogTransform extends Transform {
                 processResources.doLast {
                     def stringfogDir = applicationId.replace((char)'.', (char)'/')
                     def stringfogFile = new File(processResources.sourceOutputDir, stringfogDir + File.separator + "StringFog.java")
-                    StringFogClassBuilder.buildStringFogClass(stringfogFile, processResources.sourceOutputDir,
-                            applicationId, "StringFog", mKey)
+                    StringFogClassGenerator.generate(stringfogFile, applicationId, FOG_CLASS_NAME,
+                            mKey, mImplementation)
                 }
             }
         }
@@ -81,7 +82,8 @@ abstract class StringFogTransform extends Transform {
     void createInjector(String[] fogPackages, DomainObjectSet<BaseVariant> variants, def applicationId) {
         variants.all { variant ->
             if (mInjector == null) {
-                mInjector = new StringFogClassInjector(fogPackages, applicationId + ".StringFog")
+                mInjector = new StringFogClassInjector(fogPackages,
+                        applicationId + "." + FOG_CLASS_NAME, mImplementation)
             }
             return true
         }

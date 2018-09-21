@@ -14,6 +14,7 @@
 package com.github.megatronking.stringfog.plugin;
 
 
+import com.github.megatronking.stringfog.IStringFog;
 import com.github.megatronking.stringfog.plugin.utils.Log;
 import com.github.megatronking.stringfog.plugin.utils.TextUtils;
 
@@ -33,16 +34,18 @@ public final class ClassVisitorFactory {
     private ClassVisitorFactory() {
     }
 
-    public static ClassVisitor create(String[] fogPackages, String fogClassName, String className, String key, ClassWriter cw) {
+    public static ClassVisitor create(IStringFog stringFogImpl, String[] fogPackages,
+                                      String fogClassName, String className, String key,
+                                      ClassWriter cw) {
         if (WhiteLists.inWhiteList(className) || !isInFogPackages(fogPackages, className)) {
             Log.v("StringFog ignore: " + className);
             return createEmpty(cw);
         }
         Log.v("StringFog execute: " + className);
-        return new StringFogClassVisitor(fogClassName, key, cw);
+        return new StringFogClassVisitor(stringFogImpl, fogClassName, key, cw);
     }
 
-    public static ClassVisitor createEmpty(ClassWriter cw) {
+    private static ClassVisitor createEmpty(ClassWriter cw) {
         return new ClassVisitor(Opcodes.ASM5, cw) {
         };
     }

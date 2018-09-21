@@ -13,6 +13,9 @@
  */
 package com.github.megatronking.stringfog.plugin;
 
+import com.github.megatronking.stringfog.IStringFog;
+import com.github.megatronking.stringfog.StringFogWrapper;
+
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
@@ -37,10 +40,12 @@ public final class StringFogClassInjector {
 
     private String[] mFogPackages;
     private String mFogClassName;
+    private IStringFog mStringFogImpl;
 
-    public StringFogClassInjector(String[] fogPackages, String fogClassName) {
+    public StringFogClassInjector(String[] fogPackages, String fogClassName, String implementation) {
         this.mFogPackages = fogPackages;
         this.mFogClassName = fogClassName;
+        this.mStringFogImpl = new StringFogWrapper(implementation);
     }
 
     public void doFog2Class(File fileIn, File fileOut, String key) throws IOException {
@@ -108,7 +113,8 @@ public final class StringFogClassInjector {
     private void processClass(InputStream classIn, OutputStream classOut, String key) throws IOException {
         ClassReader cr = new ClassReader(classIn);
         ClassWriter cw = new ClassWriter(0);
-        ClassVisitor cv = ClassVisitorFactory.create(mFogPackages, mFogClassName, cr.getClassName(), key, cw);
+        ClassVisitor cv = ClassVisitorFactory.create(mStringFogImpl, mFogPackages, mFogClassName,
+                cr.getClassName(), key, cw);
         cr.accept(cv, 0);
         classOut.write(cw.toByteArray());
         classOut.flush();
