@@ -98,7 +98,8 @@ public final class StringFogImpl implements IStringFog {
 
     @Override
     public boolean overflow(String data, String key) {
-        return data.length() >= 65535;
+        // CBC has some padding length, I think 65535/2 is absolute ok.
+        return data.length() * 4 / 3 >= 65535 / 2;
     }
 
     private void initAESEncryptCipherIfNecessary(String key) {
