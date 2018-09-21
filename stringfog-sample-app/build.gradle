@@ -5,8 +5,9 @@ stringfog {
     key 'Hello Application'
     enable true
     debug false
+    // 指定加解密的具体实现类，可以用默认实现的xor库或者aes-cbc库，也可以自己定制实现，记得配置dependencies
     implementation 'com.github.megatronking.stringfog.xor.StringFogImpl'
-    // 添加使用Fog的包名
+    // 指定需加密的代码包路径，可配置多个，未指定将默认全部加密
     fogPackages = ["com.github.megatronking.stringfog"]
 }
 
@@ -34,7 +35,9 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.android.support:appcompat-v7:25.1.1'
-    compile 'com.github.megatronking.stringfog:aes-cbc:1.0.0'
     compile project(':stringfog-sample-library')
     testCompile 'junit:junit:4.12'
+
+    // xor加解密库，stringfog中的implementation需依赖此库
+    compile 'com.github.megatronking.stringfog:xor:1.0.0'
 }
