@@ -40,33 +40,38 @@ public final class StringFogClassInjector {
 
     private String[] mFogPackages;
     private String mFogClassName;
+    private String mKey;
     private IStringFog mStringFogImpl;
+    private StringFogMappingPrinter mMappingPrinter;
 
-    public StringFogClassInjector(String[] fogPackages, String fogClassName, String implementation) {
+    public StringFogClassInjector(String[] fogPackages, String key, String implementation,
+                                  String fogClassName, StringFogMappingPrinter mappingPrinter) {
         this.mFogPackages = fogPackages;
-        this.mFogClassName = fogClassName;
+        this.mKey = key;
         this.mStringFogImpl = new StringFogWrapper(implementation);
+        this.mFogClassName = fogClassName;
+        this.mMappingPrinter = mappingPrinter;
     }
 
-    public void doFog2Class(File fileIn, File fileOut, String key) throws IOException {
+    public void doFog2Class(File fileIn, File fileOut) throws IOException {
         InputStream is = null;
         OutputStream os = null;
         try {
             is = new BufferedInputStream(new FileInputStream(fileIn));
             os = new BufferedOutputStream(new FileOutputStream(fileOut));
-            processClass(is, os, key);
+            processClass(is, os);
         } finally {
             closeQuietly(os);
             closeQuietly(is);
         }
     }
 
-    public void doFog2Jar(File jarIn, File jarOut, String key) throws IOException {
+    public void doFog2Jar(File jarIn, File jarOut) throws IOException {
         try {
-            processJar(jarIn, jarOut, key, Charset.forName("UTF-8"), Charset.forName("UTF-8"));
+            processJar(jarIn, jarOut, Charset.forName("UTF-8"), Charset.forName("UTF-8"));
         } catch (IllegalArgumentException e) {
             if ("MALFORMED".equals(e.getMessage())) {
-                processJar(jarIn, jarOut, key, Charset.forName("GBK"), Charset.forName("UTF-8"));
+                processJar(jarIn, jarOut, Charset.forName("GBK"), Charset.forName("UTF-8"));
             } else {
                 throw e;
             }
@@ -74,7 +79,7 @@ public final class StringFogClassInjector {
     }
 
     @SuppressWarnings("NewApi")
-    private void processJar(File jarIn, File jarOut, String key, Charset charsetIn, Charset charsetOut) throws IOException {
+    private void processJar(File jarIn, File jarOut, Charset charsetIn, Charset charsetOut) throws IOException {
         boolean shouldExclude = shouldExcludeJar(jarIn, charsetIn);
         ZipInputStream zis = null;
         ZipOutputStream zos = null;
@@ -95,7 +100,7 @@ public final class StringFogClassInjector {
                     zos.putNextEntry(entryOut);
                     if (!entryIn.isDirectory()) {
                         if (entryName.endsWith(".class") && !shouldExclude) {
-                            processClass(zis, zos, key);
+                            processClass(zis, zos);
                         } else {
                             copy(zis, zos);
                         }
@@ -110,11 +115,11 @@ public final class StringFogClassInjector {
         }
     }
 
-    private void processClass(InputStream classIn, OutputStream classOut, String key) throws IOException {
+    private void processClass(InputStream classIn, OutputStream classOut) throws IOException {
         ClassReader cr = new ClassReader(classIn);
         ClassWriter cw = new ClassWriter(0);
-        ClassVisitor cv = ClassVisitorFactory.create(mStringFogImpl, mFogPackages, mFogClassName,
-                cr.getClassName(), key, cw);
+        ClassVisitor cv = ClassVisitorFactory.create(mStringFogImpl, mMappingPrinter, mFogPackages,
+                mKey, mFogClassName, cr.getClassName() , cw);
         cr.accept(cv, 0);
         classOut.write(cw.toByteArray());
         classOut.flush();

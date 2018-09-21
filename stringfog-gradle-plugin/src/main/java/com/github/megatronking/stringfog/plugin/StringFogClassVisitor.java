@@ -34,7 +34,7 @@ import java.util.List;
  * @since 2017/3/6 20:37
  */
 
-public class StringFogClassVisitor extends ClassVisitor {
+/* package */ class StringFogClassVisitor extends ClassVisitor {
 
     private static final String IGNORE_ANNOTATION = "Lcom/github/megatronking/stringfog" +
             "/annotation/StringFogIgnore;";
@@ -48,15 +48,17 @@ public class StringFogClassVisitor extends ClassVisitor {
     private List<ClassStringField> mFields = new ArrayList<>();
 
     private IStringFog mStringFogImpl;
+    private StringFogMappingPrinter mMappingPrinter;
     private String mClassName;
     private final String mKey;
 
     private boolean mIgnoreClass;
 
-    public StringFogClassVisitor(IStringFog stringFogImpl, String fogClassName, String key,
-                                 ClassWriter cw) {
+    /* package */ StringFogClassVisitor(IStringFog stringFogImpl, StringFogMappingPrinter mappingPrinter,
+                                 String fogClassName, String key, ClassWriter cw) {
         super(Opcodes.ASM5, cw);
         this.mStringFogImpl = stringFogImpl;
+        this.mMappingPrinter = mappingPrinter;
         this.mKey = key;
         this.mFogClassName = fogClassName.replace('.', '/');
     }
@@ -121,7 +123,10 @@ public class StringFogClassVisitor extends ClassVisitor {
                             if (!canEncrypted(field.value)) {
                                 continue;
                             }
-                            super.visitLdcInsn(mStringFogImpl.encrypt(field.value, mKey));
+                            String originValue = field.value;
+                            String encryptValue = mStringFogImpl.encrypt(originValue, mKey);
+                            mMappingPrinter.output(getJavaClassName(), originValue, encryptValue);
+                            super.visitLdcInsn(encryptValue);
                             super.visitMethodInsn(Opcodes.INVOKESTATIC, mFogClassName, "decrypt", "(Ljava/lang/String;)Ljava/lang/String;", false);
                             super.visitFieldInsn(Opcodes.PUTSTATIC, mClassName, field.name, ClassStringField.STRING_DESC);
                         }
@@ -132,7 +137,10 @@ public class StringFogClassVisitor extends ClassVisitor {
                         // Here init static or static final fields, but we must check field name int 'visitFieldInsn'
                         if (cst != null && cst instanceof String && canEncrypted((String) cst)) {
                             lastStashCst = (String) cst;
-                            super.visitLdcInsn(mStringFogImpl.encrypt(lastStashCst, mKey));
+                            String originValue = lastStashCst;
+                            String encryptValue = mStringFogImpl.encrypt(originValue, mKey);
+                            mMappingPrinter.output(getJavaClassName(), originValue, encryptValue);
+                            super.visitLdcInsn(encryptValue);
                             super.visitMethodInsn(Opcodes.INVOKESTATIC, mFogClassName, "decrypt", "(Ljava/lang/String;)Ljava/lang/String;", false);
                         } else {
                             lastStashCst = null;
@@ -171,7 +179,10 @@ public class StringFogClassVisitor extends ClassVisitor {
                     public void visitLdcInsn(Object cst) {
                         // We don't care about whether the field is final or normal
                         if (cst != null && cst instanceof String && canEncrypted((String) cst)) {
-                            super.visitLdcInsn(mStringFogImpl.encrypt((String) cst, mKey));
+                            String originValue = (String) cst;
+                            String encryptValue = mStringFogImpl.encrypt(originValue, mKey);
+                            mMappingPrinter.output(getJavaClassName(), originValue, encryptValue);
+                            super.visitLdcInsn(encryptValue);
                             super.visitMethodInsn(Opcodes.INVOKESTATIC, mFogClassName, "decrypt", "(Ljava/lang/String;)Ljava/lang/String;", false);
                         } else {
                             super.visitLdcInsn(cst);
@@ -201,7 +212,10 @@ public class StringFogClassVisitor extends ClassVisitor {
                                 }
                             }
                             // local variables
-                            super.visitLdcInsn(mStringFogImpl.encrypt((String) cst, mKey));
+                            String originValue = (String) cst;
+                            String encryptValue = mStringFogImpl.encrypt(originValue, mKey);
+                            mMappingPrinter.output(getJavaClassName(), originValue, encryptValue);
+                            super.visitLdcInsn(encryptValue);
                             super.visitMethodInsn(Opcodes.INVOKESTATIC, mFogClassName, "decrypt", "(Ljava/lang/String;)Ljava/lang/String;", false);
                             return;
                         }
@@ -224,7 +238,10 @@ public class StringFogClassVisitor extends ClassVisitor {
                 if (!canEncrypted(field.value)) {
                     continue;
                 }
-                mv.visitLdcInsn(mStringFogImpl.encrypt(field.value, mKey));
+                String originValue = field.value;
+                String encryptValue = mStringFogImpl.encrypt(originValue, mKey);
+                mMappingPrinter.output(getJavaClassName(), originValue, encryptValue);
+                mv.visitLdcInsn(encryptValue);
                 mv.visitMethodInsn(Opcodes.INVOKESTATIC, mFogClassName, "decrypt", "(Ljava/lang/String;)Ljava/lang/String;", false);
                 mv.visitFieldInsn(Opcodes.PUTSTATIC, mClassName, field.name, ClassStringField.STRING_DESC);
             }
@@ -238,6 +255,10 @@ public class StringFogClassVisitor extends ClassVisitor {
     private boolean canEncrypted(String value) {
         // Max string length is 65535, should check the encrypted length.
         return !TextUtils.isEmptyAfterTrim(value) && !mStringFogImpl.overflow(value, mKey);
+    }
+
+    private String getJavaClassName() {
+        return mClassName != null ? mClassName.replace('/', '.') : null;
     }
 
 }

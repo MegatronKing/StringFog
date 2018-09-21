@@ -17,6 +17,7 @@ package com.github.megatronking.stringfog.plugin
 import com.android.build.api.transform.*
 import com.android.build.gradle.api.BaseVariant
 import com.android.utils.FileUtils
+import com.github.megatronking.stringfog.plugin.utils.Log
 import com.github.megatronking.stringfog.plugin.utils.MD5
 import com.google.common.collect.ImmutableSet
 import com.google.common.io.Files
@@ -29,24 +30,24 @@ abstract class StringFogTransform extends Transform {
     public static final String FOG_CLASS_NAME = 'StringFog'
     private static final String TRANSFORM_NAME = 'stringFog'
 
+    protected StringFogClassInjector mInjector
+    protected StringFogMappingPrinter mMappingPrinter
+
     protected String mKey
     protected String mImplementation
-    protected boolean mEnable
-
-    protected StringFogClassInjector mInjector
 
     StringFogTransform(Project project, DomainObjectSet<BaseVariant> variants) {
         project.afterEvaluate {
-            mKey = project.stringfog.key
-            if (mKey == null || mKey.length() == 0) {
+            String key = project.stringfog.key
+            String[] fogPackages = project.stringfog.fogPackages
+            String implementation = project.stringfog.implementation
+            if (key == null || key.length() == 0) {
                 throw new IllegalArgumentException("Missing stringfog key config")
             }
-            mImplementation = project.stringfog.implementation
-            if (mImplementation == null) {
+            if (implementation == null || implementation.length() == 0) {
                 throw new IllegalArgumentException("Missing stringfog implementation config")
             }
-            mEnable = project.stringfog.enable
-            if (mEnable) {
+            if (project.stringfog.enable) {
                 def applicationId = variants.first().applicationId
                 def manifestFile = project.file("src/main/AndroidManifest.xml")
                 if (manifestFile.exists()) {
@@ -59,33 +60,35 @@ abstract class StringFogTransform extends Transform {
                         }
                     }
                 }
-                createFogClass(variants, applicationId)
-                createInjector(project.stringfog.fogPackages, variants, applicationId)
+                createFogClass(fogPackages, key, implementation, variants, applicationId)
+            } else {
+                mMappingPrinter = null
+                mInjector = null
             }
+            mKey = key
+            mImplementation = implementation
         }
     }
 
-    void createFogClass(DomainObjectSet<BaseVariant> variants, def applicationId) {
+    void createFogClass(String[] fogPackages, String key, String implementation,
+                        DomainObjectSet<BaseVariant> variants, def applicationId) {
         variants.all { variant ->
             variant.outputs.forEach { output ->
                 def processResources = output.processResources
                 processResources.doLast {
                     def stringfogDir = applicationId.replace((char)'.', (char)'/')
                     def stringfogFile = new File(processResources.sourceOutputDir, stringfogDir + File.separator + "StringFog.java")
+
+                    // Generate StringFog.java
                     StringFogClassGenerator.generate(stringfogFile, applicationId, FOG_CLASS_NAME,
-                            mKey, mImplementation)
+                            key, implementation)
+                    mMappingPrinter = new StringFogMappingPrinter(
+                            new File(project.buildDir, "outputs/mapping/${variantName.toLowerCase()}/stringfog.txt"))
+                    // Create class injector
+                    mInjector = new StringFogClassInjector(fogPackages, key, implementation,
+                            applicationId + "." + FOG_CLASS_NAME, mMappingPrinter)
                 }
             }
-        }
-    }
-
-    void createInjector(String[] fogPackages, DomainObjectSet<BaseVariant> variants, def applicationId) {
-        variants.all { variant ->
-            if (mInjector == null) {
-                mInjector = new StringFogClassInjector(fogPackages,
-                        applicationId + "." + FOG_CLASS_NAME, mImplementation)
-            }
-            return true
         }
     }
 
@@ -124,6 +127,11 @@ abstract class StringFogTransform extends Transform {
             }
         }
 
+        if (mMappingPrinter != null) {
+            mMappingPrinter.startMappingOutput()
+            mMappingPrinter.ouputInfo(mKey, mImplementation)
+        }
+
         if (!dirInputs.isEmpty() || !jarInputs.isEmpty()) {
             File dirOutput = transformInvocation.outputProvider.getContentLocation(
                     "classes", getOutputTypes(), getScopes(), Format.DIRECTORY)
@@ -143,10 +151,10 @@ abstract class StringFogTransform extends Transform {
                                     if (fileInput.isDirectory()) {
                                         return // continue.
                                     }
-                                    if (!fileInput.getName().endsWith('.class') || !mEnable || mInjector == null) {
-                                        Files.copy(fileInput, fileOutput)
+                                    if (mInjector != null && fileInput.getName().endsWith('.class')) {
+                                        mInjector.doFog2Class(fileInput, fileOutput)
                                     } else {
-                                        mInjector.doFog2Class(fileInput, fileOutput, mKey)
+                                        Files.copy(fileInput, fileOutput)
                                     }
                                     break
                                 case Status.REMOVED:
@@ -168,10 +176,10 @@ abstract class StringFogTransform extends Transform {
                         dirInput.file.traverse(type: FileType.FILES) { fileInput ->
                             File fileOutput = new File(fileInput.getAbsolutePath().replace(dirInput.file.getAbsolutePath(), dirOutput.getAbsolutePath()))
                             FileUtils.mkdirs(fileOutput.parentFile)
-                            if (!fileInput.getName().endsWith('.class') || !mEnable || mInjector == null) {
-                                Files.copy(fileInput, fileOutput)
+                            if (mInjector != null && fileInput.getName().endsWith('.class')) {
+                                mInjector.doFog2Class(fileInput, fileOutput)
                             } else {
-                                mInjector.doFog2Class(fileInput, fileOutput, mKey)
+                                Files.copy(fileInput, fileOutput)
                             }
                         }
                     }
@@ -194,10 +202,10 @@ abstract class StringFogTransform extends Transform {
                             }
                         case Status.ADDED:
                         case Status.CHANGED:
-                            if (!mEnable || mInjector == null) {
-                                Files.copy(jarInputFile, jarOutputFile)
+                            if (mInjector != null) {
+                                mInjector.doFog2Jar(jarInputFile, jarOutputFile)
                             } else {
-                                mInjector.doFog2Jar(jarInputFile, jarOutputFile, mKey)
+                                Files.copy(jarInputFile, jarOutputFile)
                             }
                             break
                         case Status.REMOVED:
@@ -210,6 +218,9 @@ abstract class StringFogTransform extends Transform {
             }
         }
 
+        if (mMappingPrinter != null) {
+            mMappingPrinter.endMappingOutput()
+        }
     }
 
     String getUniqueHashName(File fileInput) {

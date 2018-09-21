@@ -14,4 +14,10 @@ public class Log {
         }
     }
 
+    public static void e(String msg) {
+        if (isDebug) {
+            System.err.println(msg);
+        }
+    }
+
 }
