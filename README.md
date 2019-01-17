@@ -120,7 +120,7 @@ public final class StringFogImpl implements IStringFog {
 ## 更新日志
 
 ### v2.0.0
-- 修改gradle配置（必须配置implementation）。
+- 修改gradle配置（必须配置implementation指定算法实现）。
 - 修复大字符串编译失败的问题。
 - 新增自定义加解密算法扩展。
 - 新增生成mapping映射表文件。
