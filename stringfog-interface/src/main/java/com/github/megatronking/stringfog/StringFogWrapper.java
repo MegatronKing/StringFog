@@ -27,8 +27,14 @@ public final class StringFogWrapper implements IStringFog {
     public StringFogWrapper(String impl) {
         try {
             mStringFogImpl = (IStringFog) Class.forName(impl).newInstance();
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid stringfog implementation: " + impl);
+        } catch (ClassNotFoundException e) {
+            throw new IllegalArgumentException("Stringfog implementation class not found: " + impl);
+        } catch (InstantiationException e) {
+            throw new IllegalArgumentException("Stringfog implementation class new instance failed: "
+                    + e.getMessage());
+        } catch (IllegalAccessException e) {
+            throw new IllegalArgumentException("Stringfog implementation class access failed: "
+                    + e.getMessage());
         }
     }
 
