@@ -4,6 +4,5 @@ repositories {
 }
 
 dependencies {
-    // Compile only, do not set to implementation
-    compileOnly 'com.github.megatronking.stringfog:interface:1.0.0'
+    implementation 'com.github.megatronking.stringfog:interface:1.0.0'
 }
