@@ -40,8 +40,7 @@ public final class StringFogClassGenerator {
 
         int lastIndexOfDot = implementation.lastIndexOf(".");
         String implementationSimpleClassName = lastIndexOfDot == -1 ? implementation :
-                implementation.substring(implementation.lastIndexOf(".") + 1,
-                        implementation.length());
+                implementation.substring(implementation.lastIndexOf(".") + 1);
 
         JavaWriter javaWriter = new JavaWriter(new FileWriter(outputFile));
         javaWriter.emitPackage(packageName);
