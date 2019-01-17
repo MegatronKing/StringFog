@@ -65,7 +65,7 @@ stringfog {
 }
 ```
 
-##### 3、在appapp或lib的build.gradle中引入加解密库依赖。
+##### 3、在app或lib的build.gradle中引入加解密库依赖。
 ```
 dependencies {
       ...
@@ -76,15 +76,16 @@ dependencies {
 
 ### 扩展
 
-- 如果开发者有不需要自动加密的类，可以使用注解StringFogIgnore来忽略：
+#### 注解反加密
+如果开发者有不需要自动加密的类，可以使用注解StringFogIgnore来忽略：
 ```
 @StringFogIgnore
 public class Test {
     ...
 }
 ```
-- 自定义加解密算法扩展：
-实现IStringFog接口，然后替换掉上面的xor算法库依赖，参考stringfog-ext目录下面的两种算法实现。注意某些算法在不同平台上会有差异，可能出现在运行时无法正确解密的问题。
+#### 自定义加解密算法实现
+实现IStringFog接口，参考stringfog-ext目录下面的两种算法实现。注意某些算法在不同平台上会有差异，可能出现在运行时无法正确解密的问题。
 ```
 public final class StringFogImpl implements IStringFog {
 
@@ -107,8 +108,13 @@ public final class StringFogImpl implements IStringFog {
 }
 
 ```
+#### 自定义加解密算法集成
+集成自定义算法有两种方式：
+- 编译成jar或者上传至maven仓库，用classpath引入到根目录build.gradle和implementation引入到app的build.gradle中。
+- 将java源文件放置到根目录buildSrc/src/main/java下，以及app源码目录中。
 
-- 加解密的字符串明文和暗文会自动生成mapping映射文件，位于outputs/mapping/stringfog.txt。
+#### Mapping文件
+加解密的字符串明文和暗文会自动生成mapping映射文件，位于outputs/mapping/stringfog.txt。
 
 
 ## 更新日志
