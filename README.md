@@ -108,14 +108,13 @@ public final class StringFogImpl implements IStringFog {
 }
 
 ```
-#### 自定义加解密算法集成
-集成自定义算法有两种方式：
-- 编译成jar或者上传至maven仓库，用classpath引入到根目录build.gradle和implementation引入到app的build.gradle中。
-- 将java源文件放置到根目录buildSrc/src/main/java下，以及app源码目录中。
 
 #### Mapping文件
 加解密的字符串明文和暗文会自动生成mapping映射文件，位于outputs/mapping/stringfog.txt。
 
+## 范例
+- 默认加解密算法集成，参考[sample2](https://github.com/MegatronKing/StringFog-Sample2)
+- 自定义加解密算法集成，参考[sample1](https://github.com/MegatronKing/StringFog-Sample1)
 
 ## 更新日志
 

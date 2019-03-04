@@ -1,9 +1,0 @@
-repositories {
-    google()
-    jcenter()
-}
-
-dependencies {
-// 在buildSrc中引用自定义加解密算法源文件时放开此依赖，使用maven方式引用时必须注释掉此依赖
-//    implementation 'com.github.megatronking.stringfog:interface:1.0.1'
-}
