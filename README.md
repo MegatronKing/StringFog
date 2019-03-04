@@ -85,7 +85,7 @@ public class Test {
 }
 ```
 #### 自定义加解密算法实现
-实现IStringFog接口，参考stringfog-ext目录下面的两种算法实现。注意某些算法在不同平台上会有差异，可能出现在运行时无法正确解密的问题。
+实现IStringFog接口，参考stringfog-ext目录下面的两种算法实现。注意某些算法在不同平台上会有差异，可能出现在运行时无法正确解密的问题。如何集成请参考下方范例！
 ```
 public final class StringFogImpl implements IStringFog {
 
@@ -113,8 +113,8 @@ public final class StringFogImpl implements IStringFog {
 加解密的字符串明文和暗文会自动生成mapping映射文件，位于outputs/mapping/stringfog.txt。
 
 ## 范例
-- 默认加解密算法集成，参考[sample2](https://github.com/MegatronKing/StringFog-Sample2)
-- 自定义加解密算法集成，参考[sample1](https://github.com/MegatronKing/StringFog-Sample1)
+- 默认加解密算法集成，参考[sample1](https://github.com/MegatronKing/StringFog-Sample1)
+- 自定义加解密算法集成，参考[sample2](https://github.com/MegatronKing/StringFog-Sample2)
 
 ## 更新日志
 
