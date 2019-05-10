@@ -1,8 +1,8 @@
-apply plugin: 'java'
+apply plugin: 'java-library'
 //apply plugin: 'maven'
 
 dependencies {
-    implementation project(':stringfog-interface')
+    api project(':stringfog-interface')
 }
 
 targetCompatibility = '1.7'
