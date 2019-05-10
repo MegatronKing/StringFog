@@ -117,6 +117,10 @@ abstract class StringFogTransform extends Transform {
         def dirInputs = new HashSet<>()
         def jarInputs = new HashSet<>()
 
+        if (!transformInvocation.isIncremental()) {
+            transformInvocation.getOutputProvider().deleteAll()
+        }
+
         // Collecting inputs.
         transformInvocation.inputs.each { input ->
             input.directoryInputs.each { dirInput ->
@@ -169,10 +173,6 @@ abstract class StringFogTransform extends Transform {
                             }
                         }
                     } else {
-                        if (dirOutput.exists()) {
-                            dirOutput.deleteDir()
-                        }
-
                         dirInput.file.traverse(type: FileType.FILES) { fileInput ->
                             File fileOutput = new File(fileInput.getAbsolutePath().replace(dirInput.file.getAbsolutePath(), dirOutput.getAbsolutePath()))
                             FileUtils.mkdirs(fileOutput.parentFile)
