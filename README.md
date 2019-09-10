@@ -118,6 +118,9 @@ public final class StringFogImpl implements IStringFog {
 
 ## 更新日志
 
+### v2.2.0
+- 支持AGP(Android Gradle Plugin) 3.3.0+版本
+
 ### v2.1.0
 - 修复kotlin打包的bug
 
