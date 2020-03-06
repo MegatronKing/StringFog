@@ -42,7 +42,7 @@ buildscript {
     }
     dependencies {
         ...
-        classpath 'com.github.megatronking.stringfog:gradle-plugin:2.2.0'
+        classpath 'com.github.megatronking.stringfog:gradle-plugin:2.2.1'
         // 选用加解密算法库，默认实现了xor和aes-cbc两种简单算法，也可以使用自己的加解密库。
         classpath 'com.github.megatronking.stringfog:xor:1.1.0'
     }
@@ -117,6 +117,9 @@ public final class StringFogImpl implements IStringFog {
 - 自定义加解密算法集成，参考[sample2](https://github.com/MegatronKing/StringFog-Sample2)
 
 ## 更新日志
+
+### v2.2.1
+- 修复module-info类导致的报错问题
 
 ### v2.2.0
 - 支持AGP(Android Gradle Plugin) 3.3.0+版本
