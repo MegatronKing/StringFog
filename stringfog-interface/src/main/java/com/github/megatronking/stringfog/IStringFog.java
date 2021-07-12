@@ -29,7 +29,7 @@ public interface IStringFog {
      * @param key Encrypt key.
      * @return The encrypted data.
      */
-    String encrypt(String data, String key);
+    byte[] encrypt(String data, byte[] key);
 
     /**
      * Decrypt the data to origin by the special key.
@@ -38,15 +38,15 @@ public interface IStringFog {
      * @param key Encrypt key.
      * @return The original data.
      */
-    String decrypt(String data, String key);
+    String decrypt(byte[] data, byte[] key);
 
     /**
      * Whether the encrypted string length is over 65535.
      *
      * @param data The original data.
-     * @param key Encrypt key.
+     * @param keyLen Encrypt key length.
      * @return Ignore this value if the encrypted string is overflow 65535.
      */
-    boolean overflow(String data, String key);
+    boolean overflow(String data, int keyLen);
 
 }
