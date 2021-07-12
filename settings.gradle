@@ -1,6 +1,8 @@
 include ':app', ':stringfog-gradle-plugin', ':stringfog-interface'
 file('stringfog-ext').listFiles().each {
     if (it.isDirectory()) {
+        //i think xor is enough for obfuscation
+        if ("aes-cbc".equalsIgnoreCase(it.name))return
         include ":stringfog-ext:${it.name}"
     }
 }

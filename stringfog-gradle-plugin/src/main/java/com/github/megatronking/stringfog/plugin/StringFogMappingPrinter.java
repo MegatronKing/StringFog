@@ -44,7 +44,7 @@ import java.io.IOException;
     /* package */ void startMappingOutput() {
         try {
             if (mMappingFile.exists() && !mMappingFile.delete()) {
-                throw new IOException();
+                throw new IOException("delete stringfog mappingFile failed");
             }
             File dir = mMappingFile.getParentFile();
             if (dir.exists() || dir.mkdirs()) {

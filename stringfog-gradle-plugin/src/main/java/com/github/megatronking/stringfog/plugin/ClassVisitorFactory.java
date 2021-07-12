@@ -35,14 +35,14 @@ public final class ClassVisitorFactory {
     }
 
     public static ClassVisitor create(IStringFog stringFogImpl, StringFogMappingPrinter mappingPrinter,
-                                      String[] fogPackages, String key, String fogClassName,
+                                      String[] fogPackages, int keyLength, String fogClassName,
                                       String className, ClassWriter cw) {
         if (WhiteLists.inWhiteList(className) || !isInFogPackages(fogPackages, className)) {
             Log.v("StringFog ignore: " + className);
             return createEmpty(cw);
         }
         Log.v("StringFog execute: " + className);
-        return new StringFogClassVisitor(stringFogImpl, mappingPrinter, fogClassName, key, cw);
+        return new StringFogClassVisitor(stringFogImpl, mappingPrinter, fogClassName, cw,keyLength);
     }
 
     private static ClassVisitor createEmpty(ClassWriter cw) {

@@ -18,11 +18,9 @@ package com.github.megatronking.stringfog.plugin;
  * StringFog extension.
  * <p>
  * <code>
- * stringfog {
- *     key 'Hello World'
+ * stringfog {*     key 'Hello World'
  *     enable true
- * }
- * </code>
+ *}* </code>
  *
  * @author Megatron King
  * @since 2017/3/7 17:44
@@ -30,7 +28,7 @@ package com.github.megatronking.stringfog.plugin;
 
 public class StringFogExtension {
 
-    String key
+    int keyLength = 2
     boolean enable = true
     boolean debug = false
     String[] fogPackages = []

@@ -40,14 +40,14 @@ public final class StringFogClassInjector {
 
     private String[] mFogPackages;
     private String mFogClassName;
-    private String mKey;
+    private int mKeyLength;
     private IStringFog mStringFogImpl;
     private StringFogMappingPrinter mMappingPrinter;
 
-    public StringFogClassInjector(String[] fogPackages, String key, String implementation,
+    public StringFogClassInjector(String[] fogPackages, int mKeyLength, String implementation,
                                   String fogClassName, StringFogMappingPrinter mappingPrinter) {
         this.mFogPackages = fogPackages;
-        this.mKey = key;
+        this.mKeyLength = mKeyLength;
         this.mStringFogImpl = new StringFogWrapper(implementation);
         this.mFogClassName = fogClassName;
         this.mMappingPrinter = mappingPrinter;
@@ -125,9 +125,9 @@ public final class StringFogClassInjector {
                 classOut.write(buffer, 0, read);
             }
         } else {
-            ClassWriter cw = new ClassWriter(0);
+            ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
             ClassVisitor cv = ClassVisitorFactory.create(mStringFogImpl, mMappingPrinter, mFogPackages,
-                    mKey, mFogClassName, cr.getClassName() , cw);
+                    mKeyLength, mFogClassName, cr.getClassName() , cw);
             cr.accept(cv, 0);
             classOut.write(cw.toByteArray());
             classOut.flush();

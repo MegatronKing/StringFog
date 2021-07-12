@@ -34,16 +34,16 @@ abstract class StringFogTransform extends Transform {
     protected StringFogClassInjector mInjector
     protected StringFogMappingPrinter mMappingPrinter
 
-    protected String mKey
+    protected int mKeyLength
     protected String mImplementation
 
     StringFogTransform(Project project, DomainObjectSet<BaseVariant> variants) {
         project.afterEvaluate {
-            String key = project.stringfog.key
+            int keyLength = project.stringfog.keyLength
             String[] fogPackages = project.stringfog.fogPackages
             String implementation = project.stringfog.implementation
-            if (key == null || key.length() == 0) {
-                throw new IllegalArgumentException("Missing stringfog key config")
+            if (keyLength <= 0) {
+                throw new IllegalArgumentException("Missing stringfog keyLength config")
             }
             if (implementation == null || implementation.length() == 0) {
                 throw new IllegalArgumentException("Missing stringfog implementation config")
@@ -61,17 +61,17 @@ abstract class StringFogTransform extends Transform {
                         }
                     }
                 }
-                createFogClass(project, fogPackages, key, implementation, variants, applicationId)
+                createFogClass(project, fogPackages, keyLength, implementation, variants, applicationId)
             } else {
                 mMappingPrinter = null
                 mInjector = null
             }
-            mKey = key
+            mKeyLength = keyLength
             mImplementation = implementation
         }
     }
 
-    void createFogClass(def project, String[] fogPackages, String key, String implementation,
+    void createFogClass(def project, String[] fogPackages, int keyLength, String implementation,
                         DomainObjectSet<BaseVariant> variants, def applicationId) {
         variants.all { variant ->
             def variantName = variant.name.toUpperCase()[0] + variant.name.substring(1, variant.name.length() - 1)
@@ -88,12 +88,12 @@ abstract class StringFogTransform extends Transform {
                     mMappingPrinter = new StringFogMappingPrinter(
                             new File(project.buildDir, "outputs/mapping/${variant.name.toLowerCase()}/stringfog.txt"))
                     // Create class injector
-                    mInjector = new StringFogClassInjector(fogPackages, key, implementation,
+                    mInjector = new StringFogClassInjector(fogPackages, keyLength, implementation,
                             applicationId + "." + FOG_CLASS_NAME, mMappingPrinter)
 
                     // Generate StringFog.java
                     StringFogClassGenerator.generate(stringfogFile, applicationId, FOG_CLASS_NAME,
-                            key, implementation)
+                            keyLength, implementation)
                 }
             }
         }
@@ -140,7 +140,7 @@ abstract class StringFogTransform extends Transform {
 
         if (mMappingPrinter != null) {
             mMappingPrinter.startMappingOutput()
-            mMappingPrinter.ouputInfo(mKey, mImplementation)
+            mMappingPrinter.ouputInfo("mKeyLength:"+mKeyLength, mImplementation)
         }
 
         if (!dirInputs.isEmpty() || !jarInputs.isEmpty()) {
