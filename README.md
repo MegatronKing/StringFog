@@ -33,7 +33,8 @@ decrypt: new byte[]{-113, 71...} => "This is a string!"
 StringFog和混淆完全不冲突，也不需要配置反混淆，实际上StringFog配上混淆效果会更好！
 
 ### 使用
-由于开发了gradle插件，所以在集成时非常简单，不会影响到打包的配置。插件已经上传到jcenter，直接引用依赖就可以。
+由于开发了gradle插件，所以在集成时非常简单，不会影响到打包的配置。插件已经上传到MavenCentral，直接引用依赖就可以。
+**jcenter已经废弃，3.0+版本取消发布**
 
 ##### 1、在根目录build.gradle中引入插件依赖。
 ```
@@ -60,7 +61,7 @@ stringfog {
     // 可选：加密开关，默认开启。
     enable true
     // 可选：指定需加密的代码包路径，可配置多个，未指定将默认全部加密。
-    fogPackages ['com.xxx.xxx']
+    fogPackages = ['com.xxx.xxx']
     // 可选：指定密钥生成器，默认使用长度2的随机密钥（每个字符串均有随机密钥）,
     //      也可以指定一个固定的密钥：HardCodeKeyGenerator("This is a key")
     kg new RandomKeyGenerator()
@@ -106,14 +107,17 @@ public final class StringFogImpl implements IStringFog {
 
     @Override
     public boolean shouldFog(String data) {
-        // 控制指定字符串是否混淆
-        // 建议过滤到不重要或者过长的字符串
+        // 控制指定字符串是否加密
+        // 建议过滤掉不重要或者过长的字符串
         return true;
     }
 
 }
 
 ```
+
+#### 自定义密钥生成器
+实现IKeyGenerator接口，参考RandomKeyGenerator的实现。
 
 #### Mapping文件
 加解密的字符串明文和暗文会自动生成mapping映射文件，位于outputs/mapping/stringfog.txt。
