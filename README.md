@@ -20,12 +20,13 @@ String a = "This is a string!";
 
 - 加密后：
 ```
-String a = StringFog.decrypt("ABCDEFGHIJKLMN");
+String finalStaticStr = StringFog.decrypt(new byte[]{-113, 71...}, new byte[]{-23, 53});
+
 ```
 
 - 运行时：
 ```
-decrypt: "ABCDEFGHIJKLMN" => "This is a string!"
+decrypt: new byte[]{-113, 71...} => "This is a string!"
 ```
 
 ### 混淆
@@ -54,8 +55,8 @@ buildscript {
 apply plugin: 'stringfog'
 
 stringfog {
-    // 这是加解密key，可以自由定义。
-    key 'Hello World'
+    // 这是加解密随机key长度，可以自由定义。
+   keyLength 2
     // 开关
     enable true
     // 加解密库的实现类路径，需和上面配置的加解密算法库一致。

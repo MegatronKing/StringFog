@@ -15,6 +15,7 @@
 package com.github.megatronking.stringfog.plugin;
 
 import com.github.megatronking.stringfog.IStringFog;
+import com.github.megatronking.stringfog.plugin.utils.HexUtil;
 import com.github.megatronking.stringfog.plugin.utils.TextUtils;
 
 import org.objectweb.asm.AnnotationVisitor;
@@ -23,7 +24,9 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,17 +53,18 @@ import java.util.List;
     private IStringFog mStringFogImpl;
     private StringFogMappingPrinter mMappingPrinter;
     private String mClassName;
-    private final String mKey;
 
     private boolean mIgnoreClass;
 
+    private int mKeyLen = 2;
+
     /* package */ StringFogClassVisitor(IStringFog stringFogImpl, StringFogMappingPrinter mappingPrinter,
-                                 String fogClassName, String key, ClassWriter cw) {
+                                        String fogClassName, ClassWriter cw, int mKeyLen) {
         super(Opcodes.ASM5, cw);
         this.mStringFogImpl = stringFogImpl;
         this.mMappingPrinter = mappingPrinter;
-        this.mKey = key;
         this.mFogClassName = fogClassName.replace('.', '/');
+        this.mKeyLen = mKeyLen;
     }
 
     @Override
@@ -111,7 +115,7 @@ import java.util.List;
             if ("<clinit>".equals(name)) {
                 isClInitExists = true;
                 // If clinit exists meaning the static fields (not final) would have be inited here.
-                mv = new MethodVisitor(Opcodes.ASM5, mv) {
+                mv = new StubMethodVisitor(Opcodes.ASM5, mv) {
 
                     private String lastStashCst;
 
@@ -124,10 +128,7 @@ import java.util.List;
                                 continue;
                             }
                             String originValue = field.value;
-                            String encryptValue = mStringFogImpl.encrypt(originValue, mKey);
-                            mMappingPrinter.output(getJavaClassName(), originValue, encryptValue);
-                            super.visitLdcInsn(encryptValue);
-                            super.visitMethodInsn(Opcodes.INVOKESTATIC, mFogClassName, "decrypt", "(Ljava/lang/String;)Ljava/lang/String;", false);
+                            insertDecryptInstructions(originValue);
                             super.visitFieldInsn(Opcodes.PUTSTATIC, mClassName, field.name, ClassStringField.STRING_DESC);
                         }
                     }
@@ -138,10 +139,7 @@ import java.util.List;
                         if (cst != null && cst instanceof String && canEncrypted((String) cst)) {
                             lastStashCst = (String) cst;
                             String originValue = lastStashCst;
-                            String encryptValue = mStringFogImpl.encrypt(originValue, mKey);
-                            mMappingPrinter.output(getJavaClassName(), originValue, encryptValue);
-                            super.visitLdcInsn(encryptValue);
-                            super.visitMethodInsn(Opcodes.INVOKESTATIC, mFogClassName, "decrypt", "(Ljava/lang/String;)Ljava/lang/String;", false);
+                            insertDecryptInstructions(originValue);
                         } else {
                             lastStashCst = null;
                             super.visitLdcInsn(cst);
@@ -174,23 +172,20 @@ import java.util.List;
 
             } else if ("<init>".equals(name)) {
                 // Here init final(not static) and normal fields
-                mv = new MethodVisitor(Opcodes.ASM5, mv) {
+                mv = new StubMethodVisitor(Opcodes.ASM5, mv) {
                     @Override
                     public void visitLdcInsn(Object cst) {
                         // We don't care about whether the field is final or normal
                         if (cst != null && cst instanceof String && canEncrypted((String) cst)) {
                             String originValue = (String) cst;
-                            String encryptValue = mStringFogImpl.encrypt(originValue, mKey);
-                            mMappingPrinter.output(getJavaClassName(), originValue, encryptValue);
-                            super.visitLdcInsn(encryptValue);
-                            super.visitMethodInsn(Opcodes.INVOKESTATIC, mFogClassName, "decrypt", "(Ljava/lang/String;)Ljava/lang/String;", false);
+                            insertDecryptInstructions(originValue);
                         } else {
                             super.visitLdcInsn(cst);
                         }
                     }
                 };
             } else {
-                mv = new MethodVisitor(Opcodes.ASM5, mv) {
+                mv = new StubMethodVisitor(Opcodes.ASM5, mv) {
 
                     @Override
                     public void visitLdcInsn(Object cst) {
@@ -213,10 +208,7 @@ import java.util.List;
                             }
                             // local variables
                             String originValue = (String) cst;
-                            String encryptValue = mStringFogImpl.encrypt(originValue, mKey);
-                            mMappingPrinter.output(getJavaClassName(), originValue, encryptValue);
-                            super.visitLdcInsn(encryptValue);
-                            super.visitMethodInsn(Opcodes.INVOKESTATIC, mFogClassName, "decrypt", "(Ljava/lang/String;)Ljava/lang/String;", false);
+                            insertDecryptInstructions(originValue);
                             return;
                         }
                         super.visitLdcInsn(cst);
@@ -231,7 +223,7 @@ import java.util.List;
     @Override
     public void visitEnd() {
         if (!mIgnoreClass && !isClInitExists && !mStaticFinalFields.isEmpty()) {
-            MethodVisitor mv = super.visitMethod(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null);
+            StubMethodVisitor mv = new StubMethodVisitor(Opcodes.ASM5, super.visitMethod(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null));
             mv.visitCode();
             // Here init static final fields.
             for (ClassStringField field : mStaticFinalFields) {
@@ -239,10 +231,7 @@ import java.util.List;
                     continue;
                 }
                 String originValue = field.value;
-                String encryptValue = mStringFogImpl.encrypt(originValue, mKey);
-                mMappingPrinter.output(getJavaClassName(), originValue, encryptValue);
-                mv.visitLdcInsn(encryptValue);
-                mv.visitMethodInsn(Opcodes.INVOKESTATIC, mFogClassName, "decrypt", "(Ljava/lang/String;)Ljava/lang/String;", false);
+                mv.insertDecryptInstructions(originValue);
                 mv.visitFieldInsn(Opcodes.PUTSTATIC, mClassName, field.name, ClassStringField.STRING_DESC);
             }
             mv.visitInsn(Opcodes.RETURN);
@@ -254,11 +243,77 @@ import java.util.List;
 
     private boolean canEncrypted(String value) {
         // Max string length is 65535, should check the encrypted length.
-        return !TextUtils.isEmptyAfterTrim(value) && !mStringFogImpl.overflow(value, mKey);
+        return !TextUtils.isEmptyAfterTrim(value) && !mStringFogImpl.overflow(value, mKeyLen);
     }
 
     private String getJavaClassName() {
         return mClassName != null ? mClassName.replace('/', '.') : null;
+    }
+
+    /**
+     * insert decrypt Instructions
+     *
+     * @author GreyWolf
+     */
+    private class StubMethodVisitor extends MethodVisitor {
+
+        SecureRandom secureRandom = new SecureRandom();
+
+        /**
+         * Constructs a new {@link MethodVisitor}.
+         *
+         * @param api the ASM API version implemented by this visitor. Must be one
+         *            of {@link Opcodes#ASM4} or {@link Opcodes#ASM5}.
+         */
+        public StubMethodVisitor(int api) {
+            super(api);
+        }
+
+        /**
+         * Constructs a new {@link MethodVisitor}.
+         *
+         * @param api the ASM API version implemented by this visitor. Must be one
+         *            of {@link Opcodes#ASM4} or {@link Opcodes#ASM5}.
+         * @param mv  the method visitor to which this visitor must delegate method
+         */
+        public StubMethodVisitor(int api, MethodVisitor mv) {
+            super(api, mv);
+        }
+
+
+        void insertDecryptInstructions(String originalValue) {
+            byte[] tempKey = new byte[mKeyLen];
+            secureRandom.nextBytes(tempKey);
+            byte[] encryptValue = mStringFogImpl.encrypt(originalValue, tempKey);
+            mMappingPrinter.output(getJavaClassName(), originalValue, HexUtil.fromBytes(encryptValue));
+            pushArray(encryptValue);
+            pushArray(tempKey);
+            mv.visitMethodInsn(Opcodes.INVOKESTATIC, mFogClassName, "decrypt", "([B[B)Ljava/lang/String;", false);
+        }
+
+        void pushArray(byte[] buffer) {
+            pushNumber(buffer.length);
+            mv.visitIntInsn(Opcodes.NEWARRAY, Opcodes.T_BYTE);
+            mv.visitInsn(Opcodes.DUP);
+            for (int i = 0; i < buffer.length; i++) {
+                pushNumber(i);
+                pushNumber(buffer[i]);
+                mv.visitInsn(Type.BYTE_TYPE.getOpcode(Opcodes.IASTORE));
+                if (i < buffer.length - 1) mv.visitInsn(Opcodes.DUP);
+            }
+        }
+
+        void pushNumber(final int value) {
+            if (value >= -1 && value <= 5) {
+                mv.visitInsn(Opcodes.ICONST_0 + value);
+            } else if (value >= Byte.MIN_VALUE && value <= Byte.MAX_VALUE) {
+                mv.visitIntInsn(Opcodes.BIPUSH, value);
+            } else if (value >= Short.MIN_VALUE && value <= Short.MAX_VALUE) {
+                mv.visitIntInsn(Opcodes.SIPUSH, value);
+            } else {
+                mv.visitLdcInsn(value);
+            }
+        }
     }
 
 }

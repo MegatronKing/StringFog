@@ -31,7 +31,8 @@ import javax.lang.model.element.Modifier;
  */
 public final class StringFogClassGenerator {
 
-    public static void generate(File outputFile, String packageName, String className, String key,
+
+    public static void generate(File outputFile, String packageName, String className, int KeyLength,
                                 String implementation) throws IOException {
         File outputDir = outputFile.getParentFile();
         if (!outputDir.exists() && !outputDir.mkdirs()) {
@@ -56,31 +57,33 @@ public final class StringFogClassGenerator {
                 ImmutableSet.of(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL),
                 "new " + implementationSimpleClassName + "()");
 
-        javaWriter.emitEmptyLine();
-        javaWriter.beginMethod(String.class.getSimpleName(), "encrypt",
+      /*  javaWriter.emitEmptyLine();
+        javaWriter.beginMethod(byte[].class.getSimpleName(), "encrypt",
                 ImmutableSet.of(Modifier.PUBLIC, Modifier.STATIC),
-                String.class.getSimpleName(), "value");
-        javaWriter.emitStatement("return " + "IMPL.encrypt(value, \"" + key + "\")");
-        javaWriter.endMethod();
+                String.class.getSimpleName(), "value",
+                byte[].class.getSimpleName(), "key");
+        javaWriter.emitStatement("return " + "IMPL.encrypt(value, key)");
+        javaWriter.endMethod();*/
 
         javaWriter.emitEmptyLine();
         javaWriter.beginMethod(String.class.getSimpleName(), "decrypt",
                 ImmutableSet.of(Modifier.PUBLIC, Modifier.STATIC),
-                String.class.getSimpleName(), "value");
-        javaWriter.emitStatement("return " + "IMPL.decrypt(value, \"" + key + "\")");
+                byte[].class.getSimpleName(), "value",
+                byte[].class.getSimpleName(), "key");
+        javaWriter.emitStatement("return " + "IMPL.decrypt(value, key)");
         javaWriter.endMethod();
 
-        javaWriter.emitEmptyLine();
+      /*  javaWriter.emitEmptyLine();
         javaWriter.beginMethod(boolean.class.getSimpleName(), "overflow",
                 ImmutableSet.of(Modifier.PUBLIC, Modifier.STATIC),
-                String.class.getSimpleName(), "value");
-        javaWriter.emitStatement("return " + "IMPL.overflow(value, \"" + key + "\")");
-        javaWriter.endMethod();
+                String.class.getSimpleName(), "value",
+                byte[].class.getSimpleName(), "key");
+        javaWriter.emitStatement("return " + "IMPL.overflow(value, key)");
+        javaWriter.endMethod();*/
 
         javaWriter.emitEmptyLine();
         javaWriter.endType();
 
         javaWriter.close();
     }
-
 }
