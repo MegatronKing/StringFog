@@ -44,7 +44,7 @@ buildscript {
     dependencies {
         ...
         classpath 'com.github.megatronking.stringfog:gradle-plugin:3.0.0'
-        // 选用加解密算法库，默认实现了xor和aes-cbc两种简单算法，也可以使用自己的加解密库。
+        // 选用加解密算法库，默认实现了xor算法，也可以使用自己的加解密库。
         classpath 'com.github.megatronking.stringfog:xor:3.0.0'
     }
 }
@@ -55,12 +55,17 @@ buildscript {
 apply plugin: 'stringfog'
 
 stringfog {
-    // 开关
-    enable true
-    // 加解密库的实现类路径，需和上面配置的加解密算法库一致。
+    // 必要：加解密库的实现类路径，需和上面配置的加解密算法库一致。
     implementation 'com.github.megatronking.stringfog.xor.StringFogImpl'
-    // 指定需加密的代码包路径，可配置多个，未指定将默认全部加密。
-    fogPackages = ['com.xxx.xxx']
+    // 可选：加密开关，默认开启。
+    enable true
+    // 可选：指定需加密的代码包路径，可配置多个，未指定将默认全部加密。
+    fogPackages ['com.xxx.xxx']
+    // 可选：指定密钥生成器，默认使用长度2的随机密钥（每个字符串均有随机密钥）,
+    //      也可以指定一个固定的密钥：HardCodeKeyGenerator("This is a key")
+    kg new RandomKeyGenerator()
+    // 可选：调试信息打印开关，默认关闭。
+    debug true
 }
 ```
 
@@ -84,24 +89,26 @@ public class Test {
 }
 ```
 #### 自定义加解密算法实现
-实现IStringFog接口，参考stringfog-ext目录下面的两种算法实现。注意某些算法在不同平台上会有差异，可能出现在运行时无法正确解密的问题。如何集成请参考下方范例！
+实现IStringFog接口，参考stringfog-ext目录下面的xor算法实现。
+注意某些算法在不同平台上会有差异，可能出现在运行时无法正确解密的问题。如何集成请参考下方范例！
 ```
 public final class StringFogImpl implements IStringFog {
 
     @Override
-    public String encrypt(String data, String key) {
+    public byte[] encrypt(String data, byte[] key) {
         // 自定义加密
     }
 
     @Override
-    public String decrypt(String data, String key) {
+    public String decrypt(byte[] data, byte[] key) {
         // 自定义解密
     }
 
     @Override
-    public boolean overflow(String data, String key) {
-        // 最大字符串长度为65536，这里要校验加密后是否出现长度溢出，如果溢出将不进行加密。
-        // 这里可以控制符合某些条件的字符串不加密。
+    public boolean shouldFog(String data) {
+        // 控制指定字符串是否混淆
+        // 建议过滤到不重要或者过长的字符串
+        return true;
     }
 
 }
@@ -169,7 +176,7 @@ public final class StringFogImpl implements IStringFog {
 
 --------
 
-    Copyright (C) 2017, Megatron King
+    Copyright (C) 2022, Megatron King
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
