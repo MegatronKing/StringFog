@@ -49,7 +49,7 @@ class StringFogPlugin implements Plugin<Project> {
         }
     }
 
-    void applyApplication(Project project, def android) {
+    static void applyApplication(Project project, def android) {
         android.registerTransform(new StringFogTransformForApplication(project, android.applicationVariants))
         // throw an exception in instant run mode
         android.applicationVariants.all { variant ->
@@ -69,7 +69,7 @@ class StringFogPlugin implements Plugin<Project> {
         }
     }
 
-    void applyLibrary(Project project, def android) {
+    static void applyLibrary(Project project, def android) {
         android.registerTransform(new StringFogTransformForLibrary(project, android.libraryVariants))
     }
 

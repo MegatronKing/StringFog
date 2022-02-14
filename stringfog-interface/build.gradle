@@ -1,5 +1,5 @@
 apply plugin: 'java'
-//apply plugin: 'maven'
+apply plugin: 'maven'
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -14,13 +14,13 @@ version=VERSION
 
 [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
 
-//uploadArchives {
-//    repositories {
-//        mavenDeployer {
-//            repository(url: uri('../maven'))
-//        }
-//    }
-//}
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: uri('../maven'))
+        }
+    }
+}
 
 //apply from: '../bintray_java.gradle'
 //apply from: '../nexus_java.gradle'

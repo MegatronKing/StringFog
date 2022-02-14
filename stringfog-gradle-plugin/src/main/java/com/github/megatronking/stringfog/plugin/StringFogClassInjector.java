@@ -13,6 +13,7 @@
  */
 package com.github.megatronking.stringfog.plugin;
 
+import com.github.megatronking.stringfog.IKeyGenerator;
 import com.github.megatronking.stringfog.IStringFog;
 import com.github.megatronking.stringfog.StringFogWrapper;
 
@@ -30,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -38,16 +40,16 @@ import java.util.zip.ZipOutputStream;
 
 public final class StringFogClassInjector {
 
-    private String[] mFogPackages;
-    private String mFogClassName;
-    private int mKeyLength;
-    private IStringFog mStringFogImpl;
-    private StringFogMappingPrinter mMappingPrinter;
+    private final String[] mFogPackages;
+    private final String mFogClassName;
+    private final IKeyGenerator mKeyGenerator;
+    private final IStringFog mStringFogImpl;
+    private final StringFogMappingPrinter mMappingPrinter;
 
-    public StringFogClassInjector(String[] fogPackages, int mKeyLength, String implementation,
+    public StringFogClassInjector(String[] fogPackages, IKeyGenerator kg, String implementation,
                                   String fogClassName, StringFogMappingPrinter mappingPrinter) {
         this.mFogPackages = fogPackages;
-        this.mKeyLength = mKeyLength;
+        this.mKeyGenerator = kg;
         this.mStringFogImpl = new StringFogWrapper(implementation);
         this.mFogClassName = fogClassName;
         this.mMappingPrinter = mappingPrinter;
@@ -67,25 +69,12 @@ public final class StringFogClassInjector {
     }
 
     public void doFog2Jar(File jarIn, File jarOut) throws IOException {
-        try {
-            processJar(jarIn, jarOut, Charset.forName("UTF-8"), Charset.forName("UTF-8"));
-        } catch (IllegalArgumentException e) {
-            if ("MALFORMED".equals(e.getMessage())) {
-                processJar(jarIn, jarOut, Charset.forName("GBK"), Charset.forName("UTF-8"));
-            } else {
-                throw e;
-            }
-        }
-    }
-
-    @SuppressWarnings("NewApi")
-    private void processJar(File jarIn, File jarOut, Charset charsetIn, Charset charsetOut) throws IOException {
-        boolean shouldExclude = shouldExcludeJar(jarIn, charsetIn);
+        boolean shouldExclude = shouldExcludeJar(jarIn);
         ZipInputStream zis = null;
         ZipOutputStream zos = null;
         try {
-            zis = new ZipInputStream(new BufferedInputStream(new FileInputStream(jarIn)), charsetIn);
-            zos = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(jarOut)), charsetOut);
+            zis = new ZipInputStream(new BufferedInputStream(new FileInputStream(jarIn)));
+            zos = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(jarOut)));
             ZipEntry entryIn;
             Map<String, Integer> processedEntryNamesMap = new HashMap<>();
             while ((entryIn = zis.getNextEntry()) != null) {
@@ -127,21 +116,21 @@ public final class StringFogClassInjector {
         } else {
             ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
             ClassVisitor cv = ClassVisitorFactory.create(mStringFogImpl, mMappingPrinter, mFogPackages,
-                    mKeyLength, mFogClassName, cr.getClassName() , cw);
+                    mKeyGenerator, mFogClassName, cr.getClassName() , cw);
             cr.accept(cv, 0);
             classOut.write(cw.toByteArray());
             classOut.flush();
         }
     }
 
-    private boolean shouldExcludeJar(File jarIn, Charset charsetIn) throws IOException {
+    private boolean shouldExcludeJar(File jarIn) throws IOException {
         ZipInputStream zis = null;
         try {
-            zis = new ZipInputStream(new BufferedInputStream(new FileInputStream(jarIn)), charsetIn);
+            zis = new ZipInputStream(new BufferedInputStream(new FileInputStream(jarIn)));
             ZipEntry entryIn;
             while ((entryIn = zis.getNextEntry()) != null) {
                 final String entryName = entryIn.getName();
-                if (entryName != null && entryName.contains("StringFog")) {
+                if (entryName.contains("StringFog")) {
                     return true;
                 }
             }

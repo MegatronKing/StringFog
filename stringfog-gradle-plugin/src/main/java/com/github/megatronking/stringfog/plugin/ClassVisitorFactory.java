@@ -14,6 +14,7 @@
 package com.github.megatronking.stringfog.plugin;
 
 
+import com.github.megatronking.stringfog.IKeyGenerator;
 import com.github.megatronking.stringfog.IStringFog;
 import com.github.megatronking.stringfog.plugin.utils.Log;
 import com.github.megatronking.stringfog.plugin.utils.TextUtils;
@@ -35,14 +36,14 @@ public final class ClassVisitorFactory {
     }
 
     public static ClassVisitor create(IStringFog stringFogImpl, StringFogMappingPrinter mappingPrinter,
-                                      String[] fogPackages, int keyLength, String fogClassName,
+                                      String[] fogPackages, IKeyGenerator kg, String fogClassName,
                                       String className, ClassWriter cw) {
         if (WhiteLists.inWhiteList(className) || !isInFogPackages(fogPackages, className)) {
             Log.v("StringFog ignore: " + className);
             return createEmpty(cw);
         }
         Log.v("StringFog execute: " + className);
-        return new StringFogClassVisitor(stringFogImpl, mappingPrinter, fogClassName, cw,keyLength);
+        return new StringFogClassVisitor(stringFogImpl, mappingPrinter, fogClassName, cw, kg);
     }
 
     private static ClassVisitor createEmpty(ClassWriter cw) {

@@ -22,7 +22,7 @@ package com.github.megatronking.stringfog;
  */
 public final class StringFogWrapper implements IStringFog {
 
-    private IStringFog mStringFogImpl;
+    private final IStringFog mStringFogImpl;
 
     public StringFogWrapper(String impl) {
         try {
@@ -49,8 +49,8 @@ public final class StringFogWrapper implements IStringFog {
     }
 
     @Override
-    public boolean overflow(String data, int keyLength) {
-        return mStringFogImpl != null && mStringFogImpl.overflow(data, keyLength);
+    public boolean shouldFog(String data) {
+        return mStringFogImpl != null && mStringFogImpl.shouldFog(data);
     }
 
 }

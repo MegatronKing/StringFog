@@ -18,7 +18,7 @@ import com.github.megatronking.stringfog.IStringFog;
 import java.nio.charset.StandardCharsets;
 
 /**
- * StringFog base64+xor encrypt and decrypt implementation.
+ * StringFog xor encrypt and decrypt implementation.
  *
  * @author Megatron King
  * @since 2018/9/2 14:34
@@ -36,8 +36,8 @@ public final class StringFogImpl implements IStringFog {
     }
 
     @Override
-    public boolean overflow(String data, int keyLen) {
-        return data != null && data.length() * 4 / 3 >= 65535;
+    public boolean shouldFog(String data) {
+        return true;
     }
 
     private static byte[] xor(byte[] data, byte[] key) {

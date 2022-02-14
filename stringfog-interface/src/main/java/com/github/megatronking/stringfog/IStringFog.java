@@ -41,12 +41,11 @@ public interface IStringFog {
     String decrypt(byte[] data, byte[] key);
 
     /**
-     * Whether the encrypted string length is over 65535.
+     * Whether the string should be encrypted.
      *
      * @param data The original data.
-     * @param keyLen Encrypt key length.
-     * @return Ignore this value if the encrypted string is overflow 65535.
+     * @return If you want to skip this String, return false.
      */
-    boolean overflow(String data, int keyLen);
+    boolean shouldFog(String data);
 
 }

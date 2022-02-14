@@ -20,7 +20,7 @@ String a = "This is a string!";
 
 - 加密后：
 ```
-String finalStaticStr = StringFog.decrypt(new byte[]{-113, 71...}, new byte[]{-23, 53});
+String a = StringFog.decrypt(new byte[]{-113, 71...}, new byte[]{-23, 53});
 
 ```
 
@@ -43,9 +43,9 @@ buildscript {
     }
     dependencies {
         ...
-        classpath 'com.github.megatronking.stringfog:gradle-plugin:2.2.1'
+        classpath 'com.github.megatronking.stringfog:gradle-plugin:3.0.0'
         // 选用加解密算法库，默认实现了xor和aes-cbc两种简单算法，也可以使用自己的加解密库。
-        classpath 'com.github.megatronking.stringfog:xor:1.1.0'
+        classpath 'com.github.megatronking.stringfog:xor:3.0.0'
     }
 }
 ```
@@ -55,10 +55,8 @@ buildscript {
 apply plugin: 'stringfog'
 
 stringfog {
-    // 这是加解密随机key长度，可以自由定义。
-   keyLength 2
     // 开关
-    enable true
+    enable true
     // 加解密库的实现类路径，需和上面配置的加解密算法库一致。
     implementation 'com.github.megatronking.stringfog.xor.StringFogImpl'
     // 指定需加密的代码包路径，可配置多个，未指定将默认全部加密。
@@ -71,7 +69,7 @@ stringfog {
 dependencies {
       ...
       // 这里要和上面选用的加解密算法库一致，用于运行时解密。
-      compile 'com.github.megatronking.stringfog:xor:1.1.0'
+      compile 'com.github.megatronking.stringfog:xor:3.0.0'
 }
 ```
 
@@ -118,6 +116,14 @@ public final class StringFogImpl implements IStringFog {
 - 自定义加解密算法集成，参考[sample2](https://github.com/MegatronKing/StringFog-Sample2)
 
 ## 更新日志
+
+### v3.0.0
+- 密文不再以String形式存在，改为直接字节数组，感谢PR #50。
+- 重构公开API相关代码（不兼容历史版本）。
+- 删除AES加密实现，考虑到存在bug和性能问题且意义不大。
+- xor算法移除base64编码。
+- 固定加密字符串key改为随机key，且提供IKeyGenerator接口支持自定义实现。
+- 插件依赖的ASM库由5.x升级到9.2。
 
 ### v2.2.1
 - 修复module-info类导致的报错问题

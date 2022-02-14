@@ -1,5 +1,5 @@
 apply plugin: 'java-library'
-//apply plugin: 'maven'
+apply plugin: 'maven'
 
 dependencies {
     api project(':stringfog-interface')
@@ -14,13 +14,13 @@ version=VERSION
 
 [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
 
-//uploadArchives {
-//    repositories {
-//        mavenDeployer {
-//            repository(url: uri("$rootDir/maven"))
-//        }
-//    }
-//}
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: uri("$rootDir/maven"))
+        }
+    }
+}
 
 //apply from: "$rootDir/bintray_java.gradle"
 //apply from: "$rootDir/nexus_java.gradle"

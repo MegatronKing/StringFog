@@ -32,7 +32,7 @@ import java.io.IOException;
  */
 /* package */ final class StringFogMappingPrinter {
 
-    private File mMappingFile;
+    private final File mMappingFile;
     private BufferedWriter mWriter;
 
     private String mCurrentClassName;
@@ -41,7 +41,7 @@ import java.io.IOException;
         this.mMappingFile = mappingFile;
     }
 
-    /* package */ void startMappingOutput() {
+    /* package */ void startMappingOutput(String implementation) {
         try {
             if (mMappingFile.exists() && !mMappingFile.delete()) {
                 throw new IOException("delete stringfog mappingFile failed");
@@ -50,21 +50,12 @@ import java.io.IOException;
             if (dir.exists() || dir.mkdirs()) {
                 mWriter = new BufferedWriter(new FileWriter(mMappingFile));
             } else {
-                throw new IOException();
+                throw new IOException("Failed to create dir: " + dir.getPath());
             }
-        } catch (IOException e) {
-            Log.e("Create stringfog mapping file failed.");
-        }
-    }
-
-    /* package */ void ouputInfo(String key, String implementation) {
-        try {
-            mWriter.write("stringfog key : " + key);
-            mWriter.newLine();
             mWriter.write("stringfog impl: " + implementation);
             mWriter.newLine();
         } catch (IOException e) {
-            // Ignore
+            Log.e("Create stringfog mapping file failed.");
         }
     }
 
