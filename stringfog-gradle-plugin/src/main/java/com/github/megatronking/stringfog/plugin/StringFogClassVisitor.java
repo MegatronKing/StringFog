@@ -238,7 +238,7 @@ import java.util.List;
     }
 
     private boolean canEncrypted(String value) {
-        return !TextUtils.isEmptyAfterTrim(value) && mStringFogImpl.shouldFog(value);
+        return !TextUtils.isEmptyAfterTrim(value) && value.length() < 65536 >> 2 && mStringFogImpl.shouldFog(value);
     }
 
     private String getJavaClassName() {
