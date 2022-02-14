@@ -15,8 +15,7 @@
 package com.github.megatronking.stringfog.xor;
 
 import com.github.megatronking.stringfog.IStringFog;
-
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * StringFog base64+xor encrypt and decrypt implementation.
@@ -26,29 +25,14 @@ import java.io.UnsupportedEncodingException;
  */
 public final class StringFogImpl implements IStringFog {
 
-    private static final String CHARSET_NAME_UTF_8 = "UTF-8";
-
     @Override
     public byte[] encrypt(String data, byte[] key) {
-        byte[] newData;
-        try {
-            newData = xor(data.getBytes(CHARSET_NAME_UTF_8), key);
-        } catch (UnsupportedEncodingException e) {
-            newData = xor(data.getBytes(), key);
-        }
-        return newData;
+        return xor(data.getBytes(StandardCharsets.UTF_8), key);
     }
 
     @Override
     public String decrypt(byte[] data, byte[] key) {
-        String newData;
-        byte[] buffer = xor(data, key);
-        try {
-            newData = new String(buffer, CHARSET_NAME_UTF_8);
-        } catch (UnsupportedEncodingException e) {
-            newData = new String(buffer);
-        }
-        return newData;
+        return new String(xor(data, key), StandardCharsets.UTF_8);
     }
 
     @Override
