@@ -16,9 +16,9 @@ sourceSets {
             srcDir 'src/main/groovy'
         }
 
-        resources {
-            srcDir 'src/main/resources'
-        }
+//        resources {
+//            srcDir 'src/main/resources'
+//        }
     }
 }
 
