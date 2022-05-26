@@ -1,8 +1,8 @@
 apply plugin: 'java'
-apply plugin: 'maven'
+apply plugin: 'maven-publish'
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
 }
 
 targetCompatibility = '1.7'
@@ -14,13 +14,12 @@ version=VERSION
 
 [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
 
-uploadArchives {
+publishing {
     repositories {
-        mavenDeployer {
-            repository(url: uri('../maven'))
+        maven {
+            url = uri('../maven')
         }
     }
 }
-
 //apply from: '../bintray_java.gradle'
 //apply from: '../nexus_java.gradle'
