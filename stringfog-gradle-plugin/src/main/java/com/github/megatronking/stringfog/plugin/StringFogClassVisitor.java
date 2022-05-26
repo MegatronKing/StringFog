@@ -60,7 +60,7 @@ import java.util.List;
 
     /* package */ StringFogClassVisitor(IStringFog stringFogImpl, StringFogMappingPrinter mappingPrinter,
                                         String fogClassName, ClassWriter cw, IKeyGenerator kg) {
-        super(Opcodes.ASM5, cw);
+        super(Opcodes.ASM9, cw);
         this.mStringFogImpl = stringFogImpl;
         this.mMappingPrinter = mappingPrinter;
         this.mFogClassName = fogClassName.replace('.', '/');
@@ -117,7 +117,7 @@ import java.util.List;
         if ("<clinit>".equals(name)) {
             isClInitExists = true;
             // If clinit exists meaning the static fields (not final) would have be inited here.
-            mv = new StubMethodVisitor(Opcodes.ASM5, mv) {
+            mv = new StubMethodVisitor(Opcodes.ASM9, mv) {
 
                 private String lastStashCst;
 
@@ -172,7 +172,7 @@ import java.util.List;
 
         } else if ("<init>".equals(name)) {
             // Here init final(not static) and normal fields
-            mv = new StubMethodVisitor(Opcodes.ASM5, mv) {
+            mv = new StubMethodVisitor(Opcodes.ASM9, mv) {
                 @Override
                 public void visitLdcInsn(Object cst) {
                     // We don't care about whether the field is final or normal
@@ -184,7 +184,7 @@ import java.util.List;
                 }
             };
         } else {
-            mv = new StubMethodVisitor(Opcodes.ASM5, mv) {
+            mv = new StubMethodVisitor(Opcodes.ASM9, mv) {
 
                 @Override
                 public void visitLdcInsn(Object cst) {
@@ -220,7 +220,7 @@ import java.util.List;
     @Override
     public void visitEnd() {
         if (!mIgnoreClass && !isClInitExists && !mStaticFinalFields.isEmpty()) {
-            StubMethodVisitor mv = new StubMethodVisitor(Opcodes.ASM5, super.visitMethod(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null));
+            StubMethodVisitor mv = new StubMethodVisitor(Opcodes.ASM9, super.visitMethod(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null));
             mv.visitCode();
             // Here init static final fields.
             for (ClassStringField field : mStaticFinalFields) {
