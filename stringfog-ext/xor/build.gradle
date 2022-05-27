@@ -1,8 +1,8 @@
 apply plugin: 'java-library'
-apply plugin: 'maven-publish'
+apply plugin: "com.vanniktech.maven.publish"
 
 dependencies {
-    api project(':stringfog-interface')
+    implementation project(':stringfog-interface')
 }
 
 targetCompatibility = '1.7'

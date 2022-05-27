@@ -1,5 +1,5 @@
 apply plugin: 'groovy'
-apply plugin: 'maven-publish'
+apply plugin: "com.vanniktech.maven.publish"
 
 dependencies {
     implementation gradleApi()
