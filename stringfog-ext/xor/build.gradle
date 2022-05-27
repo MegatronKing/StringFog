@@ -1,5 +1,6 @@
 apply plugin: 'java-library'
-apply plugin: "com.vanniktech.maven.publish"
+apply plugin: 'maven-publish'
+//apply plugin: "com.vanniktech.maven.publish"
 
 dependencies {
     implementation project(':stringfog-interface')
