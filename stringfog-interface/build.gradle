@@ -15,12 +15,63 @@ version=VERSION
 
 [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
 
-publishing {
-    repositories {
-        maven {
-            url = uri('../maven')
-        }
+
+
+// 项目group/artifact/version信息
+group 'io.github.vfishv'
+// name 默认项目名
+version '3.0.0'
+
+
+// 打包sourcesJar任务
+task sourcesJar(type: Jar, dependsOn: classes) {
+    archiveClassifier.set("sources")
+    from sourceSets.main.allSource
+}
+
+// 打包javadocJar任务
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    archiveClassifier.set("javadoc")
+    from javadoc.destinationDir
+}
+
+// 解决javadoc打包乱码
+javadoc {
+    options {
+        encoding "UTF-8"
+        charSet 'UTF-8'
+        author true
+        version true
+        title "stringfog-interface"
     }
 }
+
+
+publishing {
+    // 发布
+    publications {
+        mavenJava(MavenPublication) {
+            //指定group/artifact/version信息
+            groupId project.group
+            artifactId project.name
+            version project.version
+            // components.java jar包
+            // components.web war包
+            from components.java
+
+            // 增加 sourcesJar、javadocJar 任务
+            artifact sourcesJar
+            artifact javadocJar
+        }
+    }
+    // 发布仓库
+    repositories {
+        // 本地仓库位于USER_HOME/.m2/repository
+        mavenLocal()
+        // 其他maven仓库
+        //maven { url uri('/Users/h__d/Desktop/1') }
+    }
+}
+
 //apply from: '../bintray_java.gradle'
 //apply from: '../nexus_java.gradle'
