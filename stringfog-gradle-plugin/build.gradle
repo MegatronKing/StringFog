@@ -26,6 +26,9 @@ sourceSets {
 tasks.withType(ProcessResources){
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
+tasks.withType(Jar){
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
 
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
