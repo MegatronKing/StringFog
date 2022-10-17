@@ -2,6 +2,7 @@
 # StringFog
 一款自动对dex/aar/jar文件中的字符串进行加密Android插件工具，正如名字所言，给字符串加上一层雾霭，使人难以窥视其真面目。
 
+- 支持java/kotlin。
 - 支持app打包生成的apk加密。
 - 支持aar和jar等库文件加密。
 - 支持加解密算法的自主扩展。
@@ -44,9 +45,9 @@ buildscript {
     }
     dependencies {
         ...
-        classpath 'com.github.megatronking.stringfog:gradle-plugin:3.0.0'
+        classpath 'com.github.megatronking.stringfog:gradle-plugin:4.0.0'
         // 选用加解密算法库，默认实现了xor算法，也可以使用自己的加解密库。
-        classpath 'com.github.megatronking.stringfog:xor:3.0.0'
+        classpath 'com.github.megatronking.stringfog:xor:4.0.0'
     }
 }
 ```
@@ -79,7 +80,7 @@ stringfog {
 dependencies {
       ...
       // 这里要和上面选用的加解密算法库一致，用于运行时解密。
-      compile 'com.github.megatronking.stringfog:xor:3.0.0'
+      compile 'com.github.megatronking.stringfog:xor:4.0.0'
 }
 ```
 
