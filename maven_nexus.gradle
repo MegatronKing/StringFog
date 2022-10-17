@@ -1,9 +1,4 @@
-apply plugin: 'maven'
-apply plugin: 'signing'
-
-def isReleaseBuild() {
-    return VERSION.contains("SNAPSHOT") == false
-}
+apply plugin: 'maven-publish'
 
 def getReleaseRepositoryUrl() {
     return hasProperty('NEXUS_RELEASE_REPOSITORY_URL') ? NEXUS_RELEASE_REPOSITORY_URL
@@ -33,72 +28,53 @@ def getRepositoryPassword() {
     return p.getProperty('NEXUS_PASSWORD')
 }
 
-afterEvaluate { project ->
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            group = GROUP
+            artifactId = ARTIFACTID
+            version = VERSION
+            from components.java
 
-                pom.groupId = GROUP
-                pom.artifactId = ARTIFACTID
-                pom.version = VERSION
-                repository(url: getReleaseRepositoryUrl()) {
-                    authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
+            pom {
+                name = POM_NAME
+                description = POM_DESCRIPTION
+                url = POM_URL
+                licenses {
+                    license {
+                        name = POM_LICENCE_NAME
+                        url = POM_LICENCE_URL
+                    }
                 }
-                snapshotRepository(url: getSnapshotRepositoryUrl()) {
-                    authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
+                developers {
+                    developer {
+                        id = POM_DEVELOPER_ID
+                        name = POM_DEVELOPER_NAME
+                        email = POM_DEVELOPER_EMAIL
+                    }
                 }
-
-                pom.project {
-                    name ARTIFACTID
-                    packaging POM_PACKAGING
-                    description POM_DESCRIPTION
-                    url POM_URL
-
-                    scm {
-                        url POM_URL
-                        connection POM_SCM_CONNECTION
-                        developerConnection POM_SCM_CONNECTION
-                    }
-
-                    licenses {
-                        license {
-                            name POM_LICENCE_NAME
-                            url POM_LICENCE_URL
-                            distribution POM_LICENCE_DIST
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            id POM_DEVELOPER_ID
-                            name POM_DEVELOPER_NAME
-                        }
-                    }
+                scm {
+                    connection = POM_SCM_CONNECTION
+                    developerConnection = POM_SCM_CONNECTION
+                    url = POM_URL
                 }
             }
         }
     }
-
-    signing {
-        required { isReleaseBuild() && gradle.taskGraph.hasTask("uploadArchives") }
-        sign configurations.archives
-    }
-
-    task javadocJar(type: Jar, dependsOn: javadoc) {
-        classifier = 'javadoc'
-        from 'build/docs/javadoc'
-    }
-
-    task sourcesJar(type: Jar, dependsOn: classes) {
-        classifier = 'sources'
-        from sourceSets.main.allSource
-    }
-
-    artifacts {
-        archives sourcesJar
-        archives javadocJar
+    repositories {
+        maven {
+            // change URLs to point to your repos, e.g. http://my.org/repo
+            def releasesRepoUrl = getReleaseRepositoryUrl()
+            def snapshotsRepoUrl = getSnapshotRepositoryUrl()
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            credentials {
+                username = getRepositoryUsername()
+                password = getRepositoryPassword()
+            }
+        }
     }
 }
 
-
+signing {
+    sign publishing.publications.mavenJava
+}
