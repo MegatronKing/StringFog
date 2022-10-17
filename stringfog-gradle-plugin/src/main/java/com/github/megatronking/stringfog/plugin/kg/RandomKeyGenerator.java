@@ -12,7 +12,7 @@ import java.security.SecureRandom;
  */
 public class RandomKeyGenerator implements IKeyGenerator {
 
-    private static final int DEFAULT_LENGTH = 2;
+    private static final int DEFAULT_LENGTH = 8;
 
     private final SecureRandom mSecureRandom;
     private final int mLength;

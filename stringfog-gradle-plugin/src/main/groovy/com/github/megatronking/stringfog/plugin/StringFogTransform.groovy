@@ -36,12 +36,14 @@ abstract class StringFogTransform extends Transform {
     protected StringFogMappingPrinter mMappingPrinter
 
     protected String mImplementation
+    protected StringFogMode mMode
 
     StringFogTransform(Project project, DomainObjectSet<BaseVariant> variants) {
         project.afterEvaluate {
             IKeyGenerator kg = project.stringfog.kg
             String[] fogPackages = project.stringfog.fogPackages
             String implementation = project.stringfog.implementation
+            StringFogMode mode = project.stringfog.mode
             if (kg == null) {
                 throw new IllegalArgumentException("Missing stringfog kg config")
             }
@@ -61,17 +63,18 @@ abstract class StringFogTransform extends Transform {
                         }
                     }
                 }
-                createFogClass(project, fogPackages, kg, implementation, variants, applicationId)
+                createFogClass(project, fogPackages, kg, implementation, mode, variants, applicationId)
             } else {
                 mMappingPrinter = null
                 mInjector = null
             }
             mImplementation = implementation
+            mMode = mode
         }
     }
 
     void createFogClass(def project, String[] fogPackages, IKeyGenerator kg, String implementation,
-                        DomainObjectSet<BaseVariant> variants, def applicationId) {
+                        def mode, DomainObjectSet<BaseVariant> variants, def applicationId) {
         variants.all { variant ->
             def variantName = variant.name.toUpperCase()[0] + variant.name.substring(1, variant.name.length() - 1)
             Task generateTask = project.tasks.findByName(variantName)
@@ -87,12 +90,12 @@ abstract class StringFogTransform extends Transform {
                     mMappingPrinter = new StringFogMappingPrinter(
                             new File(project.buildDir, "outputs/mapping/${variant.name.toLowerCase()}/stringfog.txt"))
                     // Create class injector
-                    mInjector = new StringFogClassInjector(fogPackages, kg, implementation,
+                    mInjector = new StringFogClassInjector(fogPackages, kg, implementation, mode,
                             applicationId + "." + FOG_CLASS_NAME, mMappingPrinter)
 
                     // Generate StringFog.java
                     StringFogClassGenerator.generate(stringfogFile, applicationId, FOG_CLASS_NAME,
-                            kg, implementation)
+                            implementation, mode)
                 }
             }
         }
@@ -138,7 +141,7 @@ abstract class StringFogTransform extends Transform {
         }
 
         if (mMappingPrinter != null) {
-            mMappingPrinter.startMappingOutput(mImplementation)
+            mMappingPrinter.startMappingOutput(mImplementation, mMode)
         }
 
         if (!dirInputs.isEmpty() || !jarInputs.isEmpty()) {

@@ -15,7 +15,8 @@
 package com.github.megatronking.stringfog.plugin
 
 import com.github.megatronking.stringfog.IKeyGenerator
-import com.github.megatronking.stringfog.plugin.kg.RandomKeyGenerator;
+import com.github.megatronking.stringfog.plugin.kg.RandomKeyGenerator
+import com.github.megatronking.stringfog.plugin.StringFogMode
 
 /**
  * StringFog extension.
@@ -34,6 +35,9 @@ import com.github.megatronking.stringfog.plugin.kg.RandomKeyGenerator;
 
 public class StringFogExtension {
 
+    static def base64 = StringFogMode.base64
+    static def bytes = StringFogMode.bytes
+
     /**
      * The algorithm implementation for String encryption and decryption.
      * It is required.
@@ -41,20 +45,16 @@ public class StringFogExtension {
     String implementation
 
     /**
-     * Deprecated. Use the follow api instead:
-     * <code>
-     * kg = HardCodeKeyGenerator("This is a String key")
-     * </code>.
-     */
-    @Deprecated
-    String key
-
-    /**
      * A generator to generate a security key for the encryption and decryption.
      *
      * StringFog use a 8 length random key generator default.
      */
     IKeyGenerator kg = new RandomKeyGenerator()
+
+    /**
+     * How the encrypted string presents in java class, default is base64.
+     */
+    StringFogMode mode = base64
 
     /**
      * Enable or disable the StringFog plugin. Default is enabled.

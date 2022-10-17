@@ -28,6 +28,7 @@ import org.objectweb.asm.Type;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 
 /**
@@ -41,7 +42,6 @@ import java.util.List;
 
     private static final String IGNORE_ANNOTATION = "Lcom/github/megatronking/stringfog" +
             "/annotation/StringFogIgnore;";
-    private final String mFogClassName;
 
     private boolean isClInitExists;
 
@@ -54,17 +54,25 @@ import java.util.List;
     private final StringFogMappingPrinter mMappingPrinter;
     private final IKeyGenerator mKeyGenerator;
     private String mClassName;
+    private final InstructionWriter mInstructionWriter;
 
     private boolean mIgnoreClass;
 
 
     /* package */ StringFogClassVisitor(IStringFog stringFogImpl, StringFogMappingPrinter mappingPrinter,
-                                        String fogClassName, ClassWriter cw, IKeyGenerator kg) {
+                                        String fogClassName, ClassWriter cw, IKeyGenerator kg, StringFogMode mode) {
         super(Opcodes.ASM7, cw);
         this.mStringFogImpl = stringFogImpl;
         this.mMappingPrinter = mappingPrinter;
-        this.mFogClassName = fogClassName.replace('.', '/');
         this.mKeyGenerator = kg;
+        fogClassName = fogClassName.replace('.', '/');
+        if (mode == StringFogMode.base64) {
+            this.mInstructionWriter = new Base64InstructionWriter(fogClassName);
+        } else if (mode == StringFogMode.bytes) {
+            this.mInstructionWriter = new ByteArrayInstructionWriter(fogClassName);
+        } else {
+            throw new IllegalArgumentException("Unknown stringfog mode: " + mode);
+        }
     }
 
     @Override
@@ -117,7 +125,7 @@ import java.util.List;
         if ("<clinit>".equals(name)) {
             isClInitExists = true;
             // If clinit exists meaning the static fields (not final) would have be inited here.
-            mv = new StubMethodVisitor(Opcodes.ASM7, mv) {
+            mv = new MethodVisitor(Opcodes.ASM7, mv) {
 
                 private String lastStashCst;
 
@@ -129,7 +137,7 @@ import java.util.List;
                         if (!canEncrypted(field.value)) {
                             continue;
                         }
-                        insertDecryptInstructions(field.value);
+                        encryptAndWrite(field.value, mv);
                         super.visitFieldInsn(Opcodes.PUTSTATIC, mClassName, field.name, ClassStringField.STRING_DESC);
                     }
                 }
@@ -139,7 +147,7 @@ import java.util.List;
                     // Here init static or static final fields, but we must check field name int 'visitFieldInsn'
                     if (cst instanceof String && canEncrypted((String) cst)) {
                         lastStashCst = (String) cst;
-                        insertDecryptInstructions(lastStashCst);
+                        encryptAndWrite(lastStashCst, mv);
                     } else {
                         lastStashCst = null;
                         super.visitLdcInsn(cst);
@@ -172,19 +180,19 @@ import java.util.List;
 
         } else if ("<init>".equals(name)) {
             // Here init final(not static) and normal fields
-            mv = new StubMethodVisitor(Opcodes.ASM7, mv) {
+            mv = new MethodVisitor(Opcodes.ASM7, mv) {
                 @Override
                 public void visitLdcInsn(Object cst) {
                     // We don't care about whether the field is final or normal
                     if (cst instanceof String && canEncrypted((String) cst)) {
-                        insertDecryptInstructions((String) cst);
+                        encryptAndWrite((String) cst, mv);
                     } else {
                         super.visitLdcInsn(cst);
                     }
                 }
             };
         } else {
-            mv = new StubMethodVisitor(Opcodes.ASM7, mv) {
+            mv = new MethodVisitor(Opcodes.ASM7, mv) {
 
                 @Override
                 public void visitLdcInsn(Object cst) {
@@ -206,7 +214,7 @@ import java.util.List;
                             }
                         }
                         // local variables
-                        insertDecryptInstructions((String) cst);
+                        encryptAndWrite((String) cst, mv);
                         return;
                     }
                     super.visitLdcInsn(cst);
@@ -220,14 +228,14 @@ import java.util.List;
     @Override
     public void visitEnd() {
         if (!mIgnoreClass && !isClInitExists && !mStaticFinalFields.isEmpty()) {
-            StubMethodVisitor mv = new StubMethodVisitor(Opcodes.ASM7, super.visitMethod(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null));
+            MethodVisitor mv = super.visitMethod(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null);
             mv.visitCode();
             // Here init static final fields.
             for (ClassStringField field : mStaticFinalFields) {
                 if (!canEncrypted(field.value)) {
                     continue;
                 }
-                mv.insertDecryptInstructions(field.value);
+                encryptAndWrite(field.value, mv);
                 mv.visitFieldInsn(Opcodes.PUTSTATIC, mClassName, field.name, ClassStringField.STRING_DESC);
             }
             mv.visitInsn(Opcodes.RETURN);
@@ -241,50 +249,78 @@ import java.util.List;
         return !TextUtils.isEmptyAfterTrim(value) && value.length() < 65536 >> 2 && mStringFogImpl.shouldFog(value);
     }
 
+    private void encryptAndWrite(String value, MethodVisitor mv) {
+        byte[] key = mKeyGenerator.generate(value);
+        byte[] encryptValue = mStringFogImpl.encrypt(value, key);
+        String result = mInstructionWriter.write(key, encryptValue, mv);
+        mMappingPrinter.output(getJavaClassName(), value, result);
+    }
+
     private String getJavaClassName() {
         return mClassName != null ? mClassName.replace('/', '.') : null;
     }
 
-    /**
-     * insert decrypt Instructions
-     *
-     * @author GreyWolf
-     */
-    private class StubMethodVisitor extends MethodVisitor {
+    private static abstract class InstructionWriter {
 
-        /**
-         * Constructs a new {@link MethodVisitor}.
-         *
-         * @param api the ASM API version implemented by this visitor. Must be one
-         *            of {@link Opcodes#ASM4} or {@link Opcodes#ASM7}.
-         * @param mv  the method visitor to which this visitor must delegate method
-         */
-        public StubMethodVisitor(int api, MethodVisitor mv) {
-            super(api, mv);
+        private final String mFogClassName;
+
+        InstructionWriter(String fogClassName) {
+            mFogClassName = fogClassName;
         }
 
-        protected void insertDecryptInstructions(String originalValue) {
-            byte[] key = mKeyGenerator.generate(originalValue);
-            byte[] encryptValue = mStringFogImpl.encrypt(originalValue, key);
-            pushArray(encryptValue);
-            pushArray(key);
-            mv.visitMethodInsn(Opcodes.INVOKESTATIC, mFogClassName, "decrypt", "([B[B)Ljava/lang/String;", false);
-            mMappingPrinter.output(getJavaClassName(), originalValue, Arrays.toString(encryptValue));
+        abstract String write(byte[] key, byte[] value, MethodVisitor mv);
+
+        protected void writeClass(MethodVisitor mv, String descriptor) {
+            mv.visitMethodInsn(Opcodes.INVOKESTATIC, mFogClassName, "decrypt", descriptor, false);
         }
 
-        private void pushArray(byte[] buffer) {
-            pushNumber(buffer.length);
+    }
+
+    private static class Base64InstructionWriter extends InstructionWriter {
+
+        private Base64InstructionWriter(String fogClassName) {
+            super(fogClassName);
+        }
+
+        @Override
+        String write(byte[] key, byte[] value, MethodVisitor mv) {
+            String base64Key = Base64.getEncoder().encodeToString(key);
+            String base64Value = Base64.getEncoder().encodeToString(value);
+            mv.visitLdcInsn(base64Value);
+            mv.visitLdcInsn(base64Key);
+            super.writeClass(mv, "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
+            return base64Value;
+        }
+
+    }
+
+    private static class ByteArrayInstructionWriter extends InstructionWriter {
+
+        private ByteArrayInstructionWriter(String fogClassName) {
+            super(fogClassName);
+        }
+
+        @Override
+        String write(byte[] key, byte[] value, MethodVisitor mv) {
+            pushArray(mv, value);
+            pushArray(mv, key);
+            super.writeClass(mv, "([B[B)Ljava/lang/String;");
+            return Arrays.toString(value);
+        }
+
+        private void pushArray(MethodVisitor mv, byte[] buffer) {
+            pushNumber(mv, buffer.length);
             mv.visitIntInsn(Opcodes.NEWARRAY, Opcodes.T_BYTE);
             mv.visitInsn(Opcodes.DUP);
             for (int i = 0; i < buffer.length; i++) {
-                pushNumber(i);
-                pushNumber(buffer[i]);
+                pushNumber(mv, i);
+                pushNumber(mv, buffer[i]);
                 mv.visitInsn(Type.BYTE_TYPE.getOpcode(Opcodes.IASTORE));
                 if (i < buffer.length - 1) mv.visitInsn(Opcodes.DUP);
             }
         }
 
-        private void pushNumber(final int value) {
+        private void pushNumber(MethodVisitor mv, final int value) {
             if (value >= -1 && value <= 5) {
                 mv.visitInsn(Opcodes.ICONST_0 + value);
             } else if (value >= Byte.MIN_VALUE && value <= Byte.MAX_VALUE) {
@@ -295,6 +331,7 @@ import java.util.List;
                 mv.visitLdcInsn(value);
             }
         }
+
     }
 
 }

@@ -1,0 +1,12 @@
+apply plugin: 'maven-publish'
+
+publishing {
+    publications {
+        StringFogPlugin(MavenPublication) {
+            from components.java
+            groupId GROUP
+            artifactId ARTIFACTID
+            version VERSION
+        }
+    }
+}

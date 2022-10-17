@@ -41,7 +41,7 @@ import java.io.IOException;
         this.mMappingFile = mappingFile;
     }
 
-    /* package */ void startMappingOutput(String implementation) {
+    /* package */ void startMappingOutput(String implementation, StringFogMode mode) {
         try {
             if (mMappingFile.exists() && !mMappingFile.delete()) {
                 throw new IOException("delete stringfog mappingFile failed");
@@ -54,8 +54,19 @@ import java.io.IOException;
             }
             mWriter.write("stringfog impl: " + implementation);
             mWriter.newLine();
+            mWriter.write("stringfog mode: " + mode);
+            mWriter.newLine();
         } catch (IOException e) {
             Log.e("Create stringfog mapping file failed.");
+        }
+    }
+
+    /* package */ void output(String line) {
+        try {
+            mWriter.write(line);
+            mWriter.newLine();
+        } catch (IOException e) {
+            // Ignore
         }
     }
 

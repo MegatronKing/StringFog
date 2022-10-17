@@ -1,13 +1,12 @@
 apply plugin: 'java-library'
 apply plugin: 'groovy'
-apply plugin: 'maven-publish'
 
 dependencies {
     implementation gradleApi()
     implementation localGroovy()
     implementation 'com.android.tools.build:gradle:3.6.1'
     implementation 'org.ow2.asm:asm:9.2'
-    implementation 'com.squareup:javapoet:1.9.0'
+    implementation 'com.squareup:javapoet:1.10.0'
     implementation project(':stringfog-interface')
     implementation project(':stringfog-interface')
 }
@@ -23,18 +22,15 @@ sourceSets {
         }
     }
 }
-publishing {
-    publications {
-        Base64EncryptionPlugin(MavenPublication) {
-            from components.java
-            groupId GROUP
-            artifactId ARTIFACTID
-            version VERSION
-        }
-    }
+
+tasks.withType(ProcessResources){
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
-//apply from: '../bintray_java.gradle'
-//apply from: '../nexus_java.gradle'
+
+apply from: '../maven_local.gradle'
+
+// The following is used for mavenCentral publish.
+// apply from: '../maven_nexus.gradle'

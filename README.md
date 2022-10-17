@@ -55,6 +55,9 @@ buildscript {
 ```
 apply plugin: 'stringfog'
 
+// 导入RandomKeyGenerator类，如果不使用RandomKeyGenerator，可以删除此行
+import com.github.megatronking.stringfog.plugin.kg.RandomKeyGenerator
+
 stringfog {
     // 必要：加解密库的实现类路径，需和上面配置的加解密算法库一致。
     implementation 'com.github.megatronking.stringfog.xor.StringFogImpl'
@@ -62,11 +65,12 @@ stringfog {
     enable true
     // 可选：指定需加密的代码包路径，可配置多个，未指定将默认全部加密。
     fogPackages = ['com.xxx.xxx']
-    // 可选：指定密钥生成器，默认使用长度2的随机密钥（每个字符串均有随机密钥）,
-    //      也可以指定一个固定的密钥：HardCodeKeyGenerator("This is a key")
+    // 可选（3.0版本新增）：指定密钥生成器，默认使用长度8的随机密钥（每个字符串均有不同随机密钥）,
+    // 也可以指定一个固定的密钥：HardCodeKeyGenerator("This is a key")
     kg new RandomKeyGenerator()
-    // 可选：调试信息打印开关，默认关闭。
-    debug true
+    // 可选（4.0版本新增）：用于控制字符串加密后在字节码中的存在形式, 默认为base64，
+    // 也可以使用text或者bytes
+    mode base64
 }
 ```
 
@@ -127,6 +131,13 @@ public final class StringFogImpl implements IStringFog {
 - 自定义加解密算法集成，参考[sample2](https://github.com/MegatronKing/StringFog-Sample2)
 
 ## 更新日志
+
+### v4.0.0
+- 使用ASM7以支持Android 12。
+- 支持AGP(Android Gradle Plugin) 7.x版本。
+- DSL新增StringFogMode选项，用于控制字符串加密后在字节码中的存在形式，支持base64和bytes两种模式，默认使用base64。
+    - base64模式：将字符串加密后的字节序列使用base64编码，行为同1.x和2.x版本。
+    - bytes模式：将字符串加密后的字节序列直接呈现在字节码中，行为同3.x版本。
 
 ### v3.0.0
 - 密文不再以String形式存在，改为直接字节数组，感谢PR #50。

@@ -14,7 +14,6 @@
 
 package com.github.megatronking.stringfog.plugin;
 
-import com.github.megatronking.stringfog.IKeyGenerator;
 import com.google.common.collect.ImmutableSet;
 import com.squareup.javawriter.JavaWriter;
 
@@ -34,7 +33,7 @@ public final class StringFogClassGenerator {
 
 
     public static void generate(File outputFile, String packageName, String className,
-                                IKeyGenerator kg, String implementation) throws IOException {
+                                String implementation, StringFogMode mode) throws IOException {
         File outputDir = outputFile.getParentFile();
         if (!outputDir.exists() && !outputDir.mkdirs()) {
             throw new IOException("Can not mkdirs the dir: " + outputDir);
@@ -59,12 +58,22 @@ public final class StringFogClassGenerator {
                 "new " + implementationSimpleClassName + "()");
 
         javaWriter.emitEmptyLine();
-        javaWriter.beginMethod(String.class.getSimpleName(), "decrypt",
-                ImmutableSet.of(Modifier.PUBLIC, Modifier.STATIC),
-                byte[].class.getSimpleName(), "value",
-                byte[].class.getSimpleName(), "key");
-        javaWriter.emitStatement("return " + "IMPL.decrypt(value, key)");
-        javaWriter.endMethod();
+        if (mode == StringFogMode.base64) {
+            javaWriter.beginMethod(String.class.getSimpleName(), "decrypt",
+                    ImmutableSet.of(Modifier.PUBLIC, Modifier.STATIC),
+                    String.class.getSimpleName(), "value",
+                    String.class.getSimpleName(), "key");
+            javaWriter.emitStatement("return IMPL.decrypt(java.util.Base64.getDecoder().decode(value), " +
+                    "java.util.Base64.getDecoder().decode(key))");
+            javaWriter.endMethod();
+        } else if (mode == StringFogMode.bytes) {
+            javaWriter.beginMethod(String.class.getSimpleName(), "decrypt",
+                    ImmutableSet.of(Modifier.PUBLIC, Modifier.STATIC),
+                    byte[].class.getSimpleName(), "value",
+                    byte[].class.getSimpleName(), "key");
+            javaWriter.emitStatement("return IMPL.decrypt(value, key)");
+            javaWriter.endMethod();
+        }
 
         javaWriter.emitEmptyLine();
         javaWriter.endType();

@@ -30,8 +30,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -44,13 +42,15 @@ public final class StringFogClassInjector {
     private final String mFogClassName;
     private final IKeyGenerator mKeyGenerator;
     private final IStringFog mStringFogImpl;
+    private final StringFogMode mMode;
     private final StringFogMappingPrinter mMappingPrinter;
 
     public StringFogClassInjector(String[] fogPackages, IKeyGenerator kg, String implementation,
-                                  String fogClassName, StringFogMappingPrinter mappingPrinter) {
+                                  StringFogMode mode, String fogClassName, StringFogMappingPrinter mappingPrinter) {
         this.mFogPackages = fogPackages;
         this.mKeyGenerator = kg;
         this.mStringFogImpl = new StringFogWrapper(implementation);
+        this.mMode = mode;
         this.mFogClassName = fogClassName;
         this.mMappingPrinter = mappingPrinter;
     }
@@ -116,7 +116,7 @@ public final class StringFogClassInjector {
         } else {
             ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
             ClassVisitor cv = ClassVisitorFactory.create(mStringFogImpl, mMappingPrinter, mFogPackages,
-                    mKeyGenerator, mFogClassName, cr.getClassName() , cw);
+                    mKeyGenerator, mFogClassName, cr.getClassName() , mMode, cw);
             cr.accept(cv, 0);
             classOut.write(cw.toByteArray());
             classOut.flush();
