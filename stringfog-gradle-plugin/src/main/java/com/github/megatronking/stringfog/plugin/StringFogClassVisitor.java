@@ -14,6 +14,7 @@
 
 package com.github.megatronking.stringfog.plugin;
 
+import com.github.megatronking.stringfog.Base64;
 import com.github.megatronking.stringfog.IKeyGenerator;
 import com.github.megatronking.stringfog.IStringFog;
 import com.github.megatronking.stringfog.plugin.utils.TextUtils;
@@ -28,7 +29,6 @@ import org.objectweb.asm.Type;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 
 /**
@@ -284,8 +284,8 @@ import java.util.List;
 
         @Override
         String write(byte[] key, byte[] value, MethodVisitor mv) {
-            String base64Key = Base64.getEncoder().encodeToString(key);
-            String base64Value = Base64.getEncoder().encodeToString(value);
+            String base64Key = new String(Base64.encode(key, Base64.DEFAULT));
+            String base64Value = new String(Base64.encode(value, Base64.DEFAULT));
             mv.visitLdcInsn(base64Value);
             mv.visitLdcInsn(base64Key);
             super.writeClass(mv, "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");

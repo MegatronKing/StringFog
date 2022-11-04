@@ -48,6 +48,9 @@ public final class StringFogClassGenerator {
         javaWriter.emitEmptyLine();
         javaWriter.emitImports(implementation);
         javaWriter.emitEmptyLine();
+        if (mode == StringFogMode.base64) {
+            javaWriter.emitImports("com.github.megatronking.stringfog.Base64");
+        }
 
         javaWriter.emitJavadoc("Generated code from StringFog gradle plugin. Do not modify!");
         javaWriter.beginType(className, "class", ImmutableSet.of(Modifier.PUBLIC,
@@ -63,8 +66,8 @@ public final class StringFogClassGenerator {
                     ImmutableSet.of(Modifier.PUBLIC, Modifier.STATIC),
                     String.class.getSimpleName(), "value",
                     String.class.getSimpleName(), "key");
-            javaWriter.emitStatement("return IMPL.decrypt(java.util.Base64.getDecoder().decode(value), " +
-                    "java.util.Base64.getDecoder().decode(key))");
+            javaWriter.emitStatement("return IMPL.decrypt(Base64.decode(value, Base64.DEFAULT), " +
+                    "Base64.decode(key, Base64.DEFAULT))");
             javaWriter.endMethod();
         } else if (mode == StringFogMode.bytes) {
             javaWriter.beginMethod(String.class.getSimpleName(), "decrypt",
