@@ -41,13 +41,13 @@ StringFog和混淆完全不冲突，也不需要配置反混淆，实际上Strin
 ```
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         ...
-        classpath 'com.github.megatronking.stringfog:gradle-plugin:4.0.0'
+        classpath 'com.github.megatronking.stringfog:gradle-plugin:4.0.1'
         // 选用加解密算法库，默认实现了xor算法，也可以使用自己的加解密库。
-        classpath 'com.github.megatronking.stringfog:xor:4.0.0'
+        classpath 'com.github.megatronking.stringfog:xor:4.0.1'
     }
 }
 ```
@@ -80,7 +80,7 @@ stringfog {
 dependencies {
       ...
       // 这里要和上面选用的加解密算法库一致，用于运行时解密。
-      compile 'com.github.megatronking.stringfog:xor:4.0.0'
+      compile 'com.github.megatronking.stringfog:xor:4.0.1'
 }
 ```
 
@@ -132,6 +132,9 @@ public final class StringFogImpl implements IStringFog {
 - 自定义加解密算法集成，参考[sample2](https://github.com/MegatronKing/StringFog-Sample2)
 
 ## 更新日志
+
+### v4.0.1
+- 修复Base64 API版本兼容问题。
 
 ### v4.0.0
 - 使用ASM7以支持Android 12。
