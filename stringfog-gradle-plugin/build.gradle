@@ -4,7 +4,7 @@ apply plugin: 'groovy'
 dependencies {
     implementation gradleApi()
     implementation localGroovy()
-    implementation 'com.android.tools.build:gradle:3.6.1'
+    implementation 'com.android.tools.build:gradle:7.4.0'
     implementation 'org.ow2.asm:asm:9.2'
     implementation 'com.squareup:javapoet:1.10.0'
     implementation project(':stringfog-interface')
@@ -23,10 +23,10 @@ sourceSets {
     }
 }
 
-tasks.withType(ProcessResources){
+tasks.withType(ProcessResources) {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
-tasks.withType(Jar){
+tasks.withType(Jar) {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 

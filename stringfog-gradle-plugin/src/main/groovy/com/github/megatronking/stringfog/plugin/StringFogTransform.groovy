@@ -16,7 +16,6 @@ package com.github.megatronking.stringfog.plugin
 
 import com.android.build.api.transform.*
 import com.android.build.gradle.api.BaseVariant
-import com.android.utils.FileUtils
 import com.github.megatronking.stringfog.IKeyGenerator
 import com.github.megatronking.stringfog.plugin.utils.MD5
 import com.google.common.collect.ImmutableSet
@@ -26,6 +25,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.DomainObjectSet
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.internal.FileUtils
 
 abstract class StringFogTransform extends Transform {
 
