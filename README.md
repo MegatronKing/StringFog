@@ -75,6 +75,23 @@ stringfog {
 }
 ```
 
+kts中配置参考
+```
+plugins {
+    //...lib or application
+    id("stringfog")
+}
+apply(plugin = "stringfog")
+
+configure<StringFogExtension> {
+    implementation = "com.github.megatronking.stringfog.xor.StringFogImpl"// 必要：加解密库的实现类路径，需和上面配置的加解密算法库一致。
+    enable = true// 可选：加密开关，默认开启。
+    //fogPackages = arrayOf("com.xxx.xxx")// 可选：指定需加密的代码包路径，可配置多个，未指定将默认全部加密。
+    kg = com.github.megatronking.stringfog.plugin.kg.RandomKeyGenerator()
+    mode = com.github.megatronking.stringfog.plugin.StringFogMode.bytes//base64或者bytes
+}
+```
+
 ##### 3、在app或lib的build.gradle中引入加解密库依赖。
 ```
 dependencies {
