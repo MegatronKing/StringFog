@@ -21,7 +21,6 @@ import com.github.megatronking.stringfog.plugin.utils.TextUtils;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -60,8 +59,8 @@ import java.util.List;
 
 
     /* package */ StringFogClassVisitor(IStringFog stringFogImpl, StringFogMappingPrinter mappingPrinter,
-                                        String fogClassName, ClassWriter cw, IKeyGenerator kg, StringFogMode mode) {
-        super(Opcodes.ASM7, cw);
+                                        String fogClassName, ClassVisitor cv, IKeyGenerator kg, StringFogMode mode) {
+        super(Opcodes.ASM7, cv);
         this.mStringFogImpl = stringFogImpl;
         this.mMappingPrinter = mappingPrinter;
         this.mKeyGenerator = kg;
@@ -253,7 +252,9 @@ import java.util.List;
         byte[] key = mKeyGenerator.generate(value);
         byte[] encryptValue = mStringFogImpl.encrypt(value, key);
         String result = mInstructionWriter.write(key, encryptValue, mv);
-        mMappingPrinter.output(getJavaClassName(), value, result);
+        if (mMappingPrinter != null) {
+            mMappingPrinter.output(getJavaClassName(), value, result);
+        }
     }
 
     private String getJavaClassName() {

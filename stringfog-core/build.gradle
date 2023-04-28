@@ -1,0 +1,16 @@
+apply plugin: 'java-library'
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'org.ow2.asm:asm:9.2'
+    implementation 'com.squareup:javawriter:2.5.1'
+    implementation project(':stringfog-interface')
+}
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+apply from: '../maven_local.gradle'
+
+// The following is used for mavenCentral publish.
+// apply from: '../maven_nexus.gradle'

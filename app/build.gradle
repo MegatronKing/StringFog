@@ -1,11 +1,24 @@
-apply plugin: 'com.android.application'
+plugins {
+    id 'com.android.application'
+    id 'stringfog'
+}
+
+stringfog {
+    implementation 'com.github.megatronking.stringfog.xor.StringFogImpl'
+    debug true
+    enable true
+}
 
 android {
-    compileSdkVersion 31
+    namespace "com.github.megatronking.stringfog"
+    compileSdk 31
+    buildFeatures {
+        buildConfig = true
+    }
     defaultConfig {
         applicationId "com.github.megatronking.stringfog"
-        minSdkVersion 15
-        targetSdkVersion 28
+        minSdk 15
+        targetSdk 28
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
@@ -21,5 +34,6 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'com.github.megatronking.stringfog:xor:5.0.0'
     testImplementation 'junit:junit:4.12'
 }

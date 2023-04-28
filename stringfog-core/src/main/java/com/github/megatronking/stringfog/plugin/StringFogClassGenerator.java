@@ -14,7 +14,7 @@
 
 package com.github.megatronking.stringfog.plugin;
 
-import com.google.common.collect.ImmutableSet;
+import com.github.megatronking.stringfog.plugin.utils.SetUtils;
 import com.squareup.javawriter.JavaWriter;
 
 import java.io.File;
@@ -53,17 +53,17 @@ public final class StringFogClassGenerator {
         }
 
         javaWriter.emitJavadoc("Generated code from StringFog gradle plugin. Do not modify!");
-        javaWriter.beginType(className, "class", ImmutableSet.of(Modifier.PUBLIC,
+        javaWriter.beginType(className, "class", SetUtils.fromArray(Modifier.PUBLIC,
                 Modifier.FINAL));
 
         javaWriter.emitField(implementationSimpleClassName, "IMPL",
-                ImmutableSet.of(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL),
+                SetUtils.fromArray(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL),
                 "new " + implementationSimpleClassName + "()");
 
         javaWriter.emitEmptyLine();
         if (mode == StringFogMode.base64) {
             javaWriter.beginMethod(String.class.getSimpleName(), "decrypt",
-                    ImmutableSet.of(Modifier.PUBLIC, Modifier.STATIC),
+                    SetUtils.fromArray(Modifier.PUBLIC, Modifier.STATIC),
                     String.class.getSimpleName(), "value",
                     String.class.getSimpleName(), "key");
             javaWriter.emitStatement("return IMPL.decrypt(Base64.decode(value, Base64.DEFAULT), " +
@@ -71,7 +71,7 @@ public final class StringFogClassGenerator {
             javaWriter.endMethod();
         } else if (mode == StringFogMode.bytes) {
             javaWriter.beginMethod(String.class.getSimpleName(), "decrypt",
-                    ImmutableSet.of(Modifier.PUBLIC, Modifier.STATIC),
+                    SetUtils.fromArray(Modifier.PUBLIC, Modifier.STATIC),
                     byte[].class.getSimpleName(), "value",
                     byte[].class.getSimpleName(), "key");
             javaWriter.emitStatement("return IMPL.decrypt(value, key)");

@@ -14,6 +14,8 @@
 
 package com.github.megatronking.stringfog;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * A wrapper for the real implementation of fogs.
  *
@@ -26,14 +28,14 @@ public final class StringFogWrapper implements IStringFog {
 
     public StringFogWrapper(String impl) {
         try {
-            mStringFogImpl = (IStringFog) Class.forName(impl).newInstance();
+            mStringFogImpl = (IStringFog) Class.forName(impl).getDeclaredConstructor().newInstance();
         } catch (ClassNotFoundException e) {
             throw new IllegalArgumentException("Stringfog implementation class not found: " + impl);
         } catch (InstantiationException e) {
             throw new IllegalArgumentException("Stringfog implementation class new instance failed: "
                     + e.getMessage());
-        } catch (IllegalAccessException e) {
-            throw new IllegalArgumentException("Stringfog implementation class access failed: "
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new IllegalArgumentException("Stringfog implementation class create instance failed: "
                     + e.getMessage());
         }
     }

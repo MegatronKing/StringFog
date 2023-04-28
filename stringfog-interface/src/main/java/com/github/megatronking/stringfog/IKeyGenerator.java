@@ -1,5 +1,7 @@
 package com.github.megatronking.stringfog;
 
+import java.io.Serializable;
+
 /**
  * A generator uses to generate security keys.
  *

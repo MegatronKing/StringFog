@@ -12,7 +12,6 @@ public enum StringFogMode {
 
     /**
      * Replace the origin string with an encrypted byte array.
-     *
      * Warning: this mode will increase the apk file size.
      */
     bytes

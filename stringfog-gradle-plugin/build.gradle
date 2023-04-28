@@ -1,22 +1,21 @@
-apply plugin: 'java-library'
-apply plugin: 'groovy'
+plugins {
+    id "java-library"
+    id "org.jetbrains.kotlin.jvm" version "1.8.21"
+}
 
 dependencies {
     implementation gradleApi()
     implementation localGroovy()
-    implementation 'com.android.tools.build:gradle:3.6.1'
-    implementation 'org.ow2.asm:asm:9.2'
-    implementation 'com.squareup:javapoet:1.10.0'
-    implementation project(':stringfog-interface')
+    implementation 'com.android.tools.build:gradle:8.0.0'
+    implementation project(':stringfog-core')
     implementation project(':stringfog-interface')
 }
 
 sourceSets {
     main {
-        groovy {
-            srcDir 'src/main/groovy'
+        java {
+            srcDir 'src/main/java'
         }
-
         resources {
             srcDir 'src/main/resources'
         }
@@ -32,6 +31,12 @@ tasks.withType(Jar){
 
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
+
+tasks {
+    compileKotlin {
+        kotlinOptions.jvmTarget = targetCompatibility
+    }
+}
 
 apply from: '../maven_local.gradle'
 

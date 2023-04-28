@@ -17,8 +17,6 @@ package com.github.megatronking.stringfog.plugin;
 import com.github.megatronking.stringfog.plugin.utils.Log;
 import com.github.megatronking.stringfog.plugin.utils.TextUtils;
 
-import org.apache.commons.io.IOUtils;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -30,14 +28,14 @@ import java.io.IOException;
  * @author Megatron King
  * @since 2018/9/21 11:07
  */
-/* package */ final class StringFogMappingPrinter {
+public final class StringFogMappingPrinter {
 
     private final File mMappingFile;
     private BufferedWriter mWriter;
 
     private String mCurrentClassName;
 
-    /* package */ StringFogMappingPrinter(File mappingFile) {
+    public StringFogMappingPrinter(File mappingFile) {
         this.mMappingFile = mappingFile;
     }
 
@@ -90,7 +88,11 @@ import java.io.IOException;
 
     /* package */ void endMappingOutput() {
         if (mWriter != null) {
-            IOUtils.closeQuietly(mWriter);
+            try {
+                mWriter.close();
+            } catch (IOException e) {
+                // Ignore
+            }
         }
     }
 

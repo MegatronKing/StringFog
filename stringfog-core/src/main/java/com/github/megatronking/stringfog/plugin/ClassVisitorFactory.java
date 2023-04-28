@@ -20,7 +20,6 @@ import com.github.megatronking.stringfog.plugin.utils.Log;
 import com.github.megatronking.stringfog.plugin.utils.TextUtils;
 
 import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 
 /**
@@ -37,18 +36,17 @@ public final class ClassVisitorFactory {
 
     public static ClassVisitor create(IStringFog stringFogImpl, StringFogMappingPrinter mappingPrinter,
                                       String[] fogPackages, IKeyGenerator kg, String fogClassName,
-                                      String className, StringFogMode mode, ClassWriter cw) {
+                                      String className, StringFogMode mode, ClassVisitor cv) {
         if (WhiteLists.inWhiteList(className) || !isInFogPackages(fogPackages, className)) {
             Log.v("StringFog ignore: " + className);
-            return createEmpty(cw);
+            return createEmpty(cv);
         }
         Log.v("StringFog execute: " + className);
-        return new StringFogClassVisitor(stringFogImpl, mappingPrinter, fogClassName, cw, kg, mode);
+        return new StringFogClassVisitor(stringFogImpl, mappingPrinter, fogClassName, cv, kg, mode);
     }
 
-    private static ClassVisitor createEmpty(ClassWriter cw) {
-        return new ClassVisitor(Opcodes.ASM7, cw) {
-        };
+    private static ClassVisitor createEmpty(ClassVisitor cv) {
+        return new ClassVisitor(Opcodes.ASM7, cv) {};
     }
 
     private static boolean isInFogPackages(String[] fogPackages, String className) {
