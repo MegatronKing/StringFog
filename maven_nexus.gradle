@@ -34,6 +34,10 @@ java {
     withSourcesJar()
 }
 
+tasks.withType(Javadoc) {
+    options.addStringOption('Xdoclint:none', '-quiet')
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
