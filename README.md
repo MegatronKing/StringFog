@@ -45,9 +45,9 @@ buildscript {
     }
     dependencies {
         ...
-        classpath 'com.github.megatronking.stringfog:gradle-plugin:4.0.1'
+        classpath 'com.github.megatronking.stringfog:gradle-plugin:5.0.0'
         // 选用加解密算法库，默认实现了xor算法，也可以使用自己的加解密库。
-        classpath 'com.github.megatronking.stringfog:xor:4.0.1'
+        classpath 'com.github.megatronking.stringfog:xor:5.0.0'
     }
 }
 ```
@@ -76,11 +76,24 @@ stringfog {
 ```
 
 ##### 3、在app或lib的build.gradle中引入加解密库依赖。
+
 ```
 dependencies {
       ...
       // 这里要和上面选用的加解密算法库一致，用于运行时解密。
-      compile 'com.github.megatronking.stringfog:xor:4.0.1'
+      compile 'com.github.megatronking.stringfog:xor:5.0.0'
+}
+```
+
+##### 注意事项
+从AGP 8.0开始，默认不生成BuildConfig，但是StringFog依赖此配置，请注意加上下面的配置。
+```
+android {
+    // 注意请加上此配置
+    buildFeatures {
+        buildConfig = true
+    }
+    ...
 }
 ```
 
@@ -132,6 +145,9 @@ public final class StringFogImpl implements IStringFog {
 - 自定义加解密算法集成，参考[sample2](https://github.com/MegatronKing/StringFog-Sample2)
 
 ## 更新日志
+
+### v5.0.0
+- 支持Gradle 8.0。
 
 ### v4.0.1
 - 修复Base64 API版本兼容问题。
