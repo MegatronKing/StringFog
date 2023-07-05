@@ -15,18 +15,18 @@
 ![](https://github.com/MegatronKing/StringFog/blob/master/assets/flow.png)<br>
 
 - 加密前：
-```
+```java
 String a = "This is a string!";
 ```
 
 - 加密后：
-```
+```java
 String a = StringFog.decrypt(new byte[]{-113, 71...}, new byte[]{-23, 53});
 
 ```
 
 - 运行时：
-```
+```java
 decrypt: new byte[]{-113, 71...} => "This is a string!"
 ```
 
@@ -38,7 +38,7 @@ StringFog和混淆完全不冲突，也不需要配置反混淆，实际上Strin
 **jcenter已经废弃，3.0+版本取消发布**
 
 ##### 1、在根目录build.gradle中引入插件依赖。
-```
+```groovy
 buildscript {
     repositories {
         mavenCentral()
@@ -53,7 +53,7 @@ buildscript {
 ```
 
 ##### 2、在app或lib的build.gradle中配置插件。
-```
+```groovy
 apply plugin: 'stringfog'
 
 // 导入RandomKeyGenerator类，如果不使用RandomKeyGenerator，可以删除此行
@@ -76,7 +76,7 @@ stringfog {
 ```
 
 kts中配置参考
-```
+```kotlin
 plugins {
     //...lib or application
     id("stringfog")
@@ -94,7 +94,7 @@ configure<StringFogExtension> {
 
 ##### 3、在app或lib的build.gradle中引入加解密库依赖。
 
-```
+```groovy
 dependencies {
       ...
       // 这里要和上面选用的加解密算法库一致，用于运行时解密。
@@ -104,7 +104,7 @@ dependencies {
 
 ##### 注意事项
 从AGP 8.0开始，默认不生成BuildConfig，但是StringFog依赖此配置，请注意加上下面的配置。
-```
+```kotlin
 android {
     // 注意请加上此配置
     buildFeatures {
@@ -118,7 +118,7 @@ android {
 
 #### 注解反加密
 如果开发者有不需要自动加密的类，可以使用注解StringFogIgnore来忽略：
-```
+```java
 @StringFogIgnore
 public class Test {
     ...
@@ -127,7 +127,7 @@ public class Test {
 #### 自定义加解密算法实现
 实现IStringFog接口，参考stringfog-ext目录下面的xor算法实现。
 注意某些算法在不同平台上会有差异，可能出现在运行时无法正确解密的问题。如何集成请参考下方范例！
-```
+```java
 public final class StringFogImpl implements IStringFog {
 
     @Override
