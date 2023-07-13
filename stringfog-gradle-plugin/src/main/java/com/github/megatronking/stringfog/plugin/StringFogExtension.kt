@@ -43,4 +43,9 @@ abstract class StringFogExtension {
      */
     var fogPackages = emptyArray<String>()
 
+    /**
+     * 当前应用的包名
+     */
+    var packageName: String? = null
+
 }

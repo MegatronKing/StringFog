@@ -9,4 +9,10 @@ publishing {
             version VERSION
         }
     }
+
+    // 发布仓库
+    repositories {
+        // 指定路径
+        maven { url uri('../localMaven/') }
+    }
 }

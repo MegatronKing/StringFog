@@ -1,0 +1,83 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.github.megatronking.stringfog",
+    "module": "core",
+    "version": "5.0.1",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.0"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 11,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        {
+          "name": "core-5.0.1.jar",
+          "url": "core-5.0.1.jar",
+          "size": 27061,
+          "sha512": "19c8de2cfbc4a19fdb77072ebc4495af543145b318e496f0ed7a54efd234b85372d65dff13d186f651cbbf382ee99ce7c59f54ee9f249b322bbb6371ac1c536a",
+          "sha256": "8bd87d62221a7aea419d72cd51e1faf83879d0b6bb89e07ca0d69c763298164d",
+          "sha1": "d4e3f8776302c9cbe9d8561fa7a72a6b2e0e5cc3",
+          "md5": "a593d43499b74a6fd563a34e6c0c6e16"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 11,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "org.ow2.asm",
+          "module": "asm",
+          "version": {
+            "requires": "9.2"
+          }
+        },
+        {
+          "group": "com.squareup",
+          "module": "javawriter",
+          "version": {
+            "requires": "2.5.1"
+          }
+        },
+        {
+          "group": "com.github.megatronking.stringfog",
+          "module": "interface",
+          "version": {
+            "requires": "5.0.1"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "core-5.0.1.jar",
+          "url": "core-5.0.1.jar",
+          "size": 27061,
+          "sha512": "19c8de2cfbc4a19fdb77072ebc4495af543145b318e496f0ed7a54efd234b85372d65dff13d186f651cbbf382ee99ce7c59f54ee9f249b322bbb6371ac1c536a",
+          "sha256": "8bd87d62221a7aea419d72cd51e1faf83879d0b6bb89e07ca0d69c763298164d",
+          "sha1": "d4e3f8776302c9cbe9d8561fa7a72a6b2e0e5cc3",
+          "md5": "a593d43499b74a6fd563a34e6c0c6e16"
+        }
+      ]
+    }
+  ]
+}

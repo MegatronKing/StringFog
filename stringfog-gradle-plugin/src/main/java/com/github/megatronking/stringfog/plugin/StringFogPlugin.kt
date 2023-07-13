@@ -5,6 +5,7 @@ import com.android.build.api.instrumentation.FramesComputationMode
 import com.android.build.api.instrumentation.InstrumentationScope
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.gradle.AppExtension
+import com.github.megatronking.stringfog.plugin.utils.Log
 import groovy.xml.XmlParser
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -28,9 +29,13 @@ class StringFogPlugin : Plugin<Project> {
         androidComponents.onVariants { variant ->
             // Check stringfog extension
             val stringfog = project.extensions.getByType(StringFogExtension::class.java)
+            //support  log switch
+            Log.setDebug(stringfog.debug)
             if (stringfog.implementation.isNullOrEmpty()) {
                 throw IllegalArgumentException("Missing stringfog implementation config")
             }
+            //can add debug disable?
+            Log.v("StringFog variant.buildType = " + variant.buildType)
             if (!stringfog.enable) {
                 return@onVariants
             }
@@ -45,9 +50,12 @@ class StringFogPlugin : Plugin<Project> {
             if (!manifestFile.exists()) {
                 throw IllegalArgumentException("Failed to parse file $manifestFile")
             }
-            val applicationId = parsedManifest.attribute("package")?.toString()
+            var applicationId = parsedManifest.attribute("package")?.toString()
             if (applicationId.isNullOrEmpty()) {
-                throw IllegalArgumentException("Unable to resolve applicationId")
+                applicationId = stringfog.packageName
+                if (applicationId.isNullOrEmpty()) {
+                    throw IllegalArgumentException("Unable to resolve applicationId")
+                }
             }
             project.tasks.getByName("preBuild").doLast {
                 val variantName = variant.name.capitalized()

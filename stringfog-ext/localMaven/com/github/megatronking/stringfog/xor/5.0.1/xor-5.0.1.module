@@ -1,0 +1,78 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.github.megatronking.stringfog",
+    "module": "xor",
+    "version": "5.0.1",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.0"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 11,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "com.github.megatronking.stringfog",
+          "module": "interface",
+          "version": {
+            "requires": "5.0.1"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "xor-5.0.1.jar",
+          "url": "xor-5.0.1.jar",
+          "size": 1769,
+          "sha512": "8c6e654a5fcd9fa8f09ced1e2cc082513a1a8869d3f3c7d948203b089d9482bff8ed9bf60b88ee82ec6e2fd07dd2adad8a2decded76485092be8b03a1439c48c",
+          "sha256": "96fe36e08bbb97df9fb820859f4a7b6597c9dbb42108a8ce44cde30504c4cd5d",
+          "sha1": "ac417e3e2cda489c0f9ad04bf076e6e3ad0b18b0",
+          "md5": "763184ecfa466bb425ea0b267f439ac2"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 11,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "com.github.megatronking.stringfog",
+          "module": "interface",
+          "version": {
+            "requires": "5.0.1"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "xor-5.0.1.jar",
+          "url": "xor-5.0.1.jar",
+          "size": 1769,
+          "sha512": "8c6e654a5fcd9fa8f09ced1e2cc082513a1a8869d3f3c7d948203b089d9482bff8ed9bf60b88ee82ec6e2fd07dd2adad8a2decded76485092be8b03a1439c48c",
+          "sha256": "96fe36e08bbb97df9fb820859f4a7b6597c9dbb42108a8ce44cde30504c4cd5d",
+          "sha1": "ac417e3e2cda489c0f9ad04bf076e6e3ad0b18b0",
+          "md5": "763184ecfa466bb425ea0b267f439ac2"
+        }
+      ]
+    }
+  ]
+}

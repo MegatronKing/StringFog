@@ -33,7 +33,8 @@ final class WhiteLists {
 
     static {
         // default classes short name in white list.
-        addWhiteList("BuildConfig");
+        // BuildConfig support fog
+        //addWhiteList("BuildConfig");
         addWhiteList("R");
         addWhiteList("R2");
         addWhiteList("StringFog");

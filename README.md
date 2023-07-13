@@ -71,7 +71,9 @@ stringfog {
     kg new RandomKeyGenerator()
     // 可选（4.0版本新增）：用于控制字符串加密后在字节码中的存在形式, 默认为base64，
     // 也可以使用text或者bytes
-    mode base64
+    mode com.github.megatronking.stringfog.plugin.StringFogMode.bytes
+    //应用的包名
+    packageName = "com.github.megatronking"
 }
 ```
 
@@ -89,6 +91,8 @@ configure<StringFogExtension> {
     //fogPackages = arrayOf("com.xxx.xxx")// 可选：指定需加密的代码包路径，可配置多个，未指定将默认全部加密。
     kg = com.github.megatronking.stringfog.plugin.kg.RandomKeyGenerator()
     mode = com.github.megatronking.stringfog.plugin.StringFogMode.bytes//base64或者bytes
+    //应用的包名
+    packageName = "com.github.megatronking"
 }
 ```
 
