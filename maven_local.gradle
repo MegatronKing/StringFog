@@ -11,8 +11,8 @@ publishing {
     }
 
     // 发布仓库
-    repositories {
-        // 指定路径
-        maven { url uri('../localMaven/') }
-    }
+//    repositories {
+//        // 指定路径
+//        maven { url uri("${rootDir}/localMaven/") }
+//    }
 }
