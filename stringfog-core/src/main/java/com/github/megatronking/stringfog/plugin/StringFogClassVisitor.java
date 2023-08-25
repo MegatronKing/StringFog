@@ -50,7 +50,7 @@ import java.util.List;
     private final List<ClassStringField> mFields = new ArrayList<>();
 
     private final IStringFog mStringFogImpl;
-    private final StringFogMappingPrinter mMappingPrinter;
+    private final List<String> mLogs;
     private final IKeyGenerator mKeyGenerator;
     private String mClassName;
     private final InstructionWriter mInstructionWriter;
@@ -58,12 +58,13 @@ import java.util.List;
     private boolean mIgnoreClass;
 
 
-    /* package */ StringFogClassVisitor(IStringFog stringFogImpl, StringFogMappingPrinter mappingPrinter,
+    /* package */ StringFogClassVisitor(IStringFog stringFogImpl, List<String> logs,
                                         String fogClassName, ClassVisitor cv, IKeyGenerator kg, StringFogMode mode) {
         super(Opcodes.ASM7, cv);
         this.mStringFogImpl = stringFogImpl;
-        this.mMappingPrinter = mappingPrinter;
+        this.mLogs = logs;
         this.mKeyGenerator = kg;
+        this.mLogs.add(fogClassName);
         fogClassName = fogClassName.replace('.', '/');
         if (mode == StringFogMode.base64) {
             this.mInstructionWriter = new Base64InstructionWriter(fogClassName);
@@ -252,9 +253,7 @@ import java.util.List;
         byte[] key = mKeyGenerator.generate(value);
         byte[] encryptValue = mStringFogImpl.encrypt(value, key);
         String result = mInstructionWriter.write(key, encryptValue, mv);
-        if (mMappingPrinter != null) {
-            mMappingPrinter.output(getJavaClassName(), value, result);
-        }
+        mLogs.add(value + " -> " + result);
     }
 
     private String getJavaClassName() {

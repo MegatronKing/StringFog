@@ -17,15 +17,16 @@ abstract class StringFogTransform : AsmClassVisitorFactory<InstrumentationParame
     companion object {
         private lateinit var className: String
         private lateinit var extension: StringFogExtension
-        private lateinit var printer: StringFogMappingPrinter
+        private lateinit var logs: List<String>
         private lateinit var implementation: StringFogWrapper
 
-        fun setParameters(extension: StringFogExtension, printFile: File, className: String) {
+        fun setParameters(extension: StringFogExtension, logs: List<String>, className: String) {
             StringFogTransform.extension = extension
             StringFogTransform.className = className
+            StringFogTransform.logs = logs
             implementation = StringFogWrapper(extension.implementation)
-            printer = StringFogMappingPrinter(printFile)
-            printer.startMappingOutput(extension.implementation, extension.mode)
+            logs.plus("stringfog impl: " + extension.implementation)
+            logs.plus("stringfog mode: " + extension.mode)
         }
     }
 
@@ -34,7 +35,7 @@ abstract class StringFogTransform : AsmClassVisitorFactory<InstrumentationParame
         nextClassVisitor: ClassVisitor
     ): ClassVisitor {
         return ClassVisitorFactory.create(
-            implementation, printer, extension.fogPackages, extension.kg, className,
+            implementation, logs, extension.fogPackages, extension.kg, className,
             classContext.currentClassData.className, extension.mode, nextClassVisitor
         )
     }

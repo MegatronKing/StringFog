@@ -28,7 +28,7 @@ import java.io.IOException;
  * @author Megatron King
  * @since 2018/9/21 11:07
  */
-public final class StringFogMappingPrinter {
+final class StringFogMappingPrinter {
 
     private final File mMappingFile;
     private BufferedWriter mWriter;

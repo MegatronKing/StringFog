@@ -22,6 +22,8 @@ import com.github.megatronking.stringfog.plugin.utils.TextUtils;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Opcodes;
 
+import java.util.List;
+
 /**
  * A factory creates {@link ClassVisitor}.
  *
@@ -34,7 +36,7 @@ public final class ClassVisitorFactory {
     private ClassVisitorFactory() {
     }
 
-    public static ClassVisitor create(IStringFog stringFogImpl, StringFogMappingPrinter mappingPrinter,
+    public static ClassVisitor create(IStringFog stringFogImpl, List<String> logs,
                                       String[] fogPackages, IKeyGenerator kg, String fogClassName,
                                       String className, StringFogMode mode, ClassVisitor cv) {
         if (WhiteLists.inWhiteList(className) || !isInFogPackages(fogPackages, className)) {
@@ -42,7 +44,7 @@ public final class ClassVisitorFactory {
             return createEmpty(cv);
         }
         Log.v("StringFog execute: " + className);
-        return new StringFogClassVisitor(stringFogImpl, mappingPrinter, fogClassName, cv, kg, mode);
+        return new StringFogClassVisitor(stringFogImpl, logs, fogClassName, cv, kg, mode);
     }
 
     private static ClassVisitor createEmpty(ClassVisitor cv) {

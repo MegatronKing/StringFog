@@ -14,7 +14,6 @@ import org.gradle.configurationcache.extensions.capitalized
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
-import java.util.Locale
 
 class StringFogPlugin : Plugin<Project> {
 
@@ -26,12 +25,11 @@ class StringFogPlugin : Plugin<Project> {
         extension: BaseExtension,
         action: (com.android.build.gradle.api.BaseVariant) -> Unit
     ) {
-        when {
-            extension is AppExtension -> extension.applicationVariants.all(action)
-            extension is LibraryExtension -> {
+        when (extension) {
+            is AppExtension -> extension.applicationVariants.all(action)
+            is LibraryExtension -> {
                 extension.libraryVariants.all(action)
-            }
-            else -> throw GradleException(
+            } else -> throw GradleException(
                 "StringFog plugin must be used with android app," +
                         "library or feature plugin"
             )
@@ -53,49 +51,58 @@ class StringFogPlugin : Plugin<Project> {
             if (!stringfog.enable) {
                 return@onVariants
             }
+            var applicationId: String? = null
             // We must get the package name to generate <package name>.StringFog.java
+            // Priority: AndroidManifest -> namespace -> stringfog.packageName
             val manifestFile = project.file("src/main/AndroidManifest.xml")
-            if (!manifestFile.exists()) {
-                throw IllegalArgumentException("Missing file $manifestFile")
+            if (manifestFile.exists()) {
+                val parsedManifest = XmlParser().parse(
+                    InputStreamReader(FileInputStream(manifestFile), "utf-8")
+                )
+                if (!manifestFile.exists()) {
+                    throw IllegalArgumentException("Failed to parse file $manifestFile")
+                }
+                applicationId = parsedManifest.attribute("package")?.toString()
             }
-            val parsedManifest = XmlParser().parse(
-                InputStreamReader(FileInputStream(manifestFile), "utf-8")
-            )
-            if (!manifestFile.exists()) {
-                throw IllegalArgumentException("Failed to parse file $manifestFile")
+            if (applicationId.isNullOrEmpty()) {
+                applicationId = extension.namespace
             }
-            val applicationId = parsedManifest.attribute("package")?.toString()
+            if (applicationId.isNullOrEmpty()) {
+                applicationId = stringfog.packageName
+            }
             if (applicationId.isNullOrEmpty()) {
                 throw IllegalArgumentException("Unable to resolve applicationId")
             }
 
-            forEachVariant(extension) { variant ->
-                try {
-                    val stringfogDir = File(project.buildDir, "generated" +
-                            File.separatorChar + "source" + File.separatorChar + "stringFog" + File.separatorChar + variant.name.capitalized().lowercase())
-                    val provider = project.tasks.register("generateStringFog${variant.name.replaceFirstChar {
-                        if (it.isLowerCase()) it.titlecase(Locale.US) else it.toString()
-                    }}", SourceGeneratingTask::class.java) { task ->
-                        task.genDir.set(stringfogDir)
-                        task.applicationId.set(applicationId)
-                        task.implementation.set(stringfog.implementation)
-                        task.mode.set(stringfog.mode)
-                    }
-                    variant.registerJavaGeneratingTask(provider, stringfogDir)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-
-            val printFile = File(project.buildDir, "outputs/mapping/${variant.name.lowercase()}/stringfog.txt")
-            StringFogTransform.setParameters(stringfog, printFile, "$applicationId.${SourceGeneratingTask.FOG_CLASS_NAME}")
+            val logs = mutableListOf<String>()
+            StringFogTransform.setParameters(stringfog, logs, "$applicationId.${SourceGeneratingTask.FOG_CLASS_NAME}")
             variant.instrumentation.transformClassesWith(
                 StringFogTransform::class.java,
-                    InstrumentationScope.PROJECT) {
+                InstrumentationScope.PROJECT) {
             }
             variant.instrumentation.setAsmFramesComputationMode(
                 FramesComputationMode.COMPUTE_FRAMES_FOR_INSTRUMENTED_METHODS
             )
+
+            // TODO This will not work on Gradle 9.0
+            forEachVariant(extension) {
+                val generateTaskName = "generateStringFog${it.name.capitalized()}"
+                if (project.getTasksByName(generateTaskName, true).isNotEmpty()) {
+                    return@forEachVariant
+                }
+                val stringfogDir = File(project.buildDir, "generated" +
+                        File.separatorChar + "source" + File.separatorChar + "stringFog" + File.separatorChar + it.name.capitalized().lowercase())
+                val provider = project.tasks.register(generateTaskName, SourceGeneratingTask::class.java) { task ->
+                    task.genDir.set(stringfogDir)
+                    task.applicationId.set(applicationId)
+                    task.implementation.set(stringfog.implementation)
+                    task.mode.set(stringfog.mode)
+                }
+                it.registerJavaGeneratingTask(provider, stringfogDir)
+            }
+            // TODO Need a final task to write logs to file
+//            val printFile = File(project.buildDir, "outputs/mapping/${variant.name.lowercase()}/stringfog.txt")
+//            printFile.writeText(logs.joinToString("\n"))
         }
     }
 
