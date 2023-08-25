@@ -10,7 +10,7 @@
 - 完全Gradle自动化集成。
 - 不支持InstantRun。
 
-** 一些提示！**
+**一些提示**
 > 由于我目前主要精力在[Reqable](https://reqable.com)创业项目上，StringFog的Issue处理没那么及时，非常抱歉！
 虽然我已经很久不从事Android项目的开发，但是还是会尽力将StringFog一直维护下去，如果您发现了一些可以修复的问题，欢迎提交PR。
 
