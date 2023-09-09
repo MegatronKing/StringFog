@@ -8,7 +8,7 @@ import java.io.Serializable;
  * @author Megatron King
  * @since 2022/1/14 22:15
  */
-public interface IKeyGenerator {
+public interface IKeyGenerator extends Serializable {
 
     /**
      * Generate a security key.

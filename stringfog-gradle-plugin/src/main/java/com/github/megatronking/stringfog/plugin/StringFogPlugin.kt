@@ -1,7 +1,6 @@
 package com.github.megatronking.stringfog.plugin
 
 import com.android.build.api.instrumentation.FramesComputationMode
-import com.android.build.api.instrumentation.InstrumentationScope
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.BaseExtension
@@ -74,12 +73,7 @@ class StringFogPlugin : Plugin<Project> {
                 throw IllegalArgumentException("Unable to resolve applicationId")
             }
 
-            val logs = mutableListOf<String>()
-            StringFogTransform.setParameters(stringfog, logs, "$applicationId.${SourceGeneratingTask.FOG_CLASS_NAME}")
-            variant.instrumentation.transformClassesWith(
-                StringFogTransform::class.java,
-                InstrumentationScope.PROJECT) {
-            }
+            variant.instrumentation.transformClassesWithStringFog(applicationId,stringfog)
             variant.instrumentation.setAsmFramesComputationMode(
                 FramesComputationMode.COMPUTE_FRAMES_FOR_INSTRUMENTED_METHODS
             )
