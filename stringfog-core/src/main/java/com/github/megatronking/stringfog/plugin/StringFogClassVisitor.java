@@ -60,7 +60,7 @@ import java.util.List;
 
     /* package */ StringFogClassVisitor(IStringFog stringFogImpl, List<String> logs,
                                         String fogClassName, ClassVisitor cv, IKeyGenerator kg, StringFogMode mode) {
-        super(Opcodes.ASM7, cv);
+        super(Opcodes.ASM9, cv);
         this.mStringFogImpl = stringFogImpl;
         this.mLogs = logs;
         this.mKeyGenerator = kg;
@@ -125,7 +125,7 @@ import java.util.List;
         if ("<clinit>".equals(name)) {
             isClInitExists = true;
             // If clinit exists meaning the static fields (not final) would have be inited here.
-            mv = new MethodVisitor(Opcodes.ASM7, mv) {
+            mv = new MethodVisitor(Opcodes.ASM9, mv) {
 
                 private String lastStashCst;
 
@@ -180,7 +180,7 @@ import java.util.List;
 
         } else if ("<init>".equals(name)) {
             // Here init final(not static) and normal fields
-            mv = new MethodVisitor(Opcodes.ASM7, mv) {
+            mv = new MethodVisitor(Opcodes.ASM9, mv) {
                 @Override
                 public void visitLdcInsn(Object cst) {
                     // We don't care about whether the field is final or normal
@@ -192,7 +192,7 @@ import java.util.List;
                 }
             };
         } else {
-            mv = new MethodVisitor(Opcodes.ASM7, mv) {
+            mv = new MethodVisitor(Opcodes.ASM9, mv) {
 
                 @Override
                 public void visitLdcInsn(Object cst) {

@@ -48,7 +48,7 @@ public final class ClassVisitorFactory {
     }
 
     private static ClassVisitor createEmpty(ClassVisitor cv) {
-        return new ClassVisitor(Opcodes.ASM7, cv) {};
+        return new ClassVisitor(Opcodes.ASM9, cv) {};
     }
 
     private static boolean isInFogPackages(String[] fogPackages, String className) {
