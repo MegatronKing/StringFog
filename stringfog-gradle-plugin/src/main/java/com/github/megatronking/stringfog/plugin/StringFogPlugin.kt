@@ -75,10 +75,16 @@ class StringFogPlugin : Plugin<Project> {
             }
 
             val logs = mutableListOf<String>()
-            StringFogTransform.setParameters(stringfog, logs, "$applicationId.${SourceGeneratingTask.FOG_CLASS_NAME}")
             variant.instrumentation.transformClassesWith(
                 StringFogTransform::class.java,
-                InstrumentationScope.PROJECT) {
+                InstrumentationScope.PROJECT
+            ) { params ->
+                params.setParameters(
+                    applicationId,
+                    stringfog,
+                    logs,
+                    "$applicationId.${SourceGeneratingTask.FOG_CLASS_NAME}"
+                )
             }
             variant.instrumentation.setAsmFramesComputationMode(
                 FramesComputationMode.COMPUTE_FRAMES_FOR_INSTRUMENTED_METHODS
