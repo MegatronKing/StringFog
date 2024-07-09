@@ -12,32 +12,18 @@ import org.gradle.api.tasks.Input
 import org.objectweb.asm.ClassVisitor
 import java.io.File
 
-abstract class StringFogTransform : AsmClassVisitorFactory<InstrumentationParameters.None> {
-
-    companion object {
-        private lateinit var className: String
-        private lateinit var extension: StringFogExtension
-        private lateinit var logs: List<String>
-        private lateinit var implementation: StringFogWrapper
-
-        fun setParameters(extension: StringFogExtension, logs: List<String>, className: String) {
-            StringFogTransform.extension = extension
-            StringFogTransform.className = className
-            StringFogTransform.logs = logs
-            implementation = StringFogWrapper(extension.implementation)
-            logs.plus("stringfog impl: " + extension.implementation)
-            logs.plus("stringfog mode: " + extension.mode)
-        }
-    }
+abstract class StringFogTransform : AsmClassVisitorFactory<StringFogInstrumentationParams> {
 
     override fun createClassVisitor(
         classContext: ClassContext,
         nextClassVisitor: ClassVisitor
     ): ClassVisitor {
-        return ClassVisitorFactory.create(
-            implementation, logs, extension.fogPackages, extension.kg, className,
-            classContext.currentClassData.className, extension.mode, nextClassVisitor
-        )
+        return with(parameters.get()) {
+            ClassVisitorFactory.create(
+                implementation, logs, extension.fogPackages, extension.kg, className.get(),
+                classContext.currentClassData.className, extension.mode, nextClassVisitor
+            )
+        }
     }
 
     override fun isInstrumentable(classData: ClassData): Boolean {
