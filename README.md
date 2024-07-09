@@ -49,7 +49,7 @@ buildscript {
     }
     dependencies {
         ...
-        classpath 'com.github.megatronking.stringfog:gradle-plugin:5.1.0'
+        classpath 'com.github.megatronking.stringfog:gradle-plugin:5.2.0'
         // 选用加解密算法库，默认实现了xor算法，也可以使用自己的加解密库。
         classpath 'com.github.megatronking.stringfog:xor:5.0.0'
     }
@@ -174,6 +174,10 @@ public final class StringFogImpl implements IStringFog {
 - 自定义加解密算法集成，参考[sample2](https://github.com/MegatronKing/StringFog-Sample2)
 
 ## 更新日志
+
+### v5.2.0
+- 从ASM7升级到ASM9。
+- 修复多模块配置问题。
 
 ### v5.1.0
 - 修复获取无法获取packageName的问题。
